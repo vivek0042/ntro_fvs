@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import '../assets/style/Location.css'; // Import the CSS file using the relative path
+import '../../assets/style/Location.css'; // Import the CSS file using the relative path
 
 function LocationMaster() {
   const [columnDefs] = useState([
@@ -10,8 +10,8 @@ function LocationMaster() {
     { headerName: 'Location Name', field: 'LocationName', sortable: true, filter: true, flex: 1, minWidth: 150 },
     { 
       headerName: 'Status', 
-      field: 'button', 
-      cellRendererFramework: params => (
+      field: 'IsActive', 
+      cellRenderer: params => (
         <StatusButtonCell 
           value={params.value} 
           onUpdateStatus={() => handleUpdateStatus(params.data.LocationId, !params.value)} 
@@ -55,8 +55,14 @@ function LocationMaster() {
     }
   };
 
+  const handleQuickFilter = (event) => {
+    if (gridApi) {
+      gridApi.setQuickFilter(event.target.value);
+    }
+  };
+
   const handleUpdateStatus = (locationId, newStatus) => {
-    const url = `http://192.168.11.221:8070/api/master/InActiveStatusChange`;
+    const url = `http://192.168.11.212:8070/api/master/InActiveStatusChange`;
     const method = 'PUT'; // or 'POST', adjust as per your API requirements
 
     fetch(url, {
@@ -65,7 +71,7 @@ function LocationMaster() {
         'Content-Type': 'application/json', 
       },
       body: JSON.stringify({ 
-        IsActive: newStatus,
+        IsActive: Number(newStatus),
         InActiveParamName: "locationMaster",
         StatusChangeId: locationId,
         EntryBy: 1
@@ -96,6 +102,15 @@ function LocationMaster() {
       });
   };
 
+  const handleExport = () => {
+    if (gridApi) {
+      const params = {
+        columnKeys: ['LocationId', 'LocationName'], // Specify the columns you want to include in the CSV
+      };
+      gridApi.exportDataAsCsv(params);
+    }
+  };
+
   return (
     <div className="grid-wrapper">
       <div className="grid-controls">
@@ -109,6 +124,11 @@ function LocationMaster() {
             ))}
           </select>
         </label>
+        <label>
+          Search:
+          <input type="text" onChange={handleQuickFilter} placeholder="Search..." />
+        </label>
+        <button onClick={handleExport}>Download CSV</button>
       </div>
       <div className="ag-theme-alpine grid-container">
         <div style={{ height: '500px', width: '100%' }}>
