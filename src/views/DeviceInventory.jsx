@@ -1,42 +1,39 @@
-// src/pages/LocationMaster.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import 'ag-grid-community/styles/ag-grid.css';
-import Form from '../components/Form';
-import '../App.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import '../assets/style/Location.css';
-import { fetchLocations , deleteLocation } from '../services/location.services';
-import { updateStatus} from '../services/common.services'
 import StatusButtonCell from '../components/StatusButtonCell';
-function LocationMaster() {
+import Form from '../components/Form';
+import { fetchDevices, deleteDevice } from '../services/DeviceInventory.services';
+import {updateStatus} from '../services/common.services'
+const DeviceInventory = () => {
   const [columnDefs] = useState([
-    { headerName: 'Location Id', field: 'LocationId', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { headerName: 'Device Id', field: 'DeviceId', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { headerName: 'Serial No', field: 'DeviceSerialNo', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { headerName: 'Device Type', field: 'DeviceType', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { headerName: 'Model Name', field: 'DeviceModelName', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { headerName: 'Device Ip', field: 'DeviceIp', sortable: true, filter: true, flex: 1, minWidth: 150 },
     { headerName: 'Location Name', field: 'LocationName', sortable: true, filter: true, flex: 1, minWidth: 150 },
-    {
-      headerName: 'Status',
-      field: 'IsActive',
+    { headerName: 'Device Status', field: 'CardStatusID', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { headerName: 'Remark', field: 'Remark', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { 
+      headerName: 'Status', 
+      field: 'IsActive', 
       cellRenderer: params => (
-        <StatusButtonCell
-          value={params.value}
-          onUpdateStatus={() => handleUpdateStatus(params.data.LocationId, !params.value)}
+        <StatusButtonCell 
+          value={params.value} 
+          onUpdateStatus={() => handleUpdateStatus(params.data.Id, !params.value)} 
         />
       ),
-      flex: 1,
+      flex: 1, 
       minWidth: 150,
     },
     {
       cellRenderer: params => (
         <>
-          <FaEdit
-            style={{ marginRight: '20px', cursor: 'pointer', color: 'skyblue' }}
-            onClick={() => { setLocation(params.data.LocationId); setIsFormOpen(true); }}
-          />
-          <FaTrash
-            style={{ marginRight: '10px', cursor: 'pointer', color: 'crimson' }}
-            onClick={() => delteLocation(params.data.LocationId)}
-          />
+          <FaEdit style={{ marginRight: '20px', cursor: 'pointer', color: 'skyblue' }} onClick={() => { setDeviceId(params.data.Id); setIsFormOpen(true); }} />
+          <FaTrash style={{ marginRight: '10px', cursor: 'pointer', color: 'crimson' }} onClick={() => deleteDeviceHandler(params.data.Id)} />
         </>
       ),
       flex: 1,
@@ -45,18 +42,19 @@ function LocationMaster() {
   ]);
 
   const [rowData, setRowData] = useState([]);
-  const [location, setLocation] = useState(0);
+  const [deviceId, setDeviceId] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchLocations();
-      setRowData(data);
-    };
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    const devices = await fetchDevices();
+    setRowData(devices);
+  };
 
   const onGridReady = useCallback((params) => {
     setGridApi(params.api);
@@ -76,15 +74,10 @@ function LocationMaster() {
     }
   };
 
-  const handleUpdateStatus = async (locationId, newStatus) => {
+  const handleUpdateStatus = async (deviceId, newStatus) => {
     try {
-      await updateStatus(locationId, newStatus , "LocationMaster");
-      setRowData(prevData => prevData.map(row => {
-        if (row.LocationId === locationId) {
-          return { ...row, IsActive: newStatus };
-        }
-        return row;
-      }));
+      await updateStatus(deviceId, newStatus , "Device");
+      setRowData(prevData => prevData.map(row => row.Id === deviceId ? { ...row, IsActive: newStatus } : row));
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -93,36 +86,36 @@ function LocationMaster() {
   const handleExport = () => {
     if (gridApi) {
       const params = {
-        columnKeys: ['LocationId', 'LocationName'],
+        columnKeys: ['DeviceId', 'DeviceSerialNo', 'DeviceType', 'DeviceModelName', 'DeviceIp', 'LocationName', 'CardStatusID', 'Remark', 'IsActive'],
       };
       gridApi.exportDataAsCsv(params);
     }
   };
 
-  const handleAddLocation = () => {
-    setLocation(0);
+  const handleAddDevice = () => {
+    setDeviceId(0);
     setIsFormOpen(false);
-    fetchLocations().then(setRowData);
+    fetchData();
   };
 
   const handleCancelForm = () => {
-    setLocation(0);
+    setDeviceId(0);
     setIsFormOpen(false);
   };
 
-  const delteLocation = async (locId) => {
+  const deleteDeviceHandler = async (deviceId) => {
     try {
-      await deleteLocation(locId);
-      fetchLocations().then(setRowData);
+      await deleteDevice(deviceId);
+      fetchData();
     } catch (error) {
-      console.error('Error deleting location:', error);
+      console.error('Error deleting device:', error);
     }
   };
 
   return (
     <div className="content-inner">
       {isFormOpen ? (
-        <Form onAddLocation={handleAddLocation} onCancel={handleCancelForm} LocationId={location} params="Location" />
+        <Form onAddDevice={handleAddDevice} onCancel={handleCancelForm} DeviceId={deviceId} params="Device" />
       ) : (
         <>
           <div className="grid-controls">
@@ -141,8 +134,8 @@ function LocationMaster() {
               <input type="text" onChange={handleQuickFilter} placeholder="Search..." />
             </label>
             <label>
-              <button className='btnDownload' onClick={handleExport}>Download</button>
-              <button className='btnAdd' onClick={() => setIsFormOpen(true)}>Add Location</button>
+              <button className="btnDownload" onClick={handleExport}>Download</button>
+              <button className="btnAdd" onClick={() => setIsFormOpen(true)}>Add Device</button>
             </label>
           </div>
           <div className="ag-theme-alpine grid-container">
@@ -166,8 +159,8 @@ function LocationMaster() {
       )}
     </div>
   );
-}
+};
 
 
 
-export default LocationMaster;
+export default DeviceInventory;
