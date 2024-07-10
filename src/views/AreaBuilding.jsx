@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../components/Apiconfig';
 import Sidebar from '../components/Sidebar';
-import {AddLocation} from '../components/Addlocation';
+import {AddAreaBuilding} from '../components/Addlocation';
 import { LocationContext } from '../hooks/LocationContext';
 import useCountDetails from '../components/UseCountDetails';
 import { AgGridReact } from 'ag-grid-react';
@@ -12,19 +12,20 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import '../assets/style/Location.css';
 
-function LocationMaster() {
+function AreaBuilding() {
   const { locations, setLocations, countDetails, setCountDetails } = useContext(LocationContext);
-
   const [columnDefs] = useState([
-    { headerName: 'Location Id', field: 'LocationId', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { headerName: 'AreaBuilding ID', field: 'AreaBuildingId', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { headerName: 'Area/Building Name', field: 'AreaBuildingName', sortable: true, filter: true, flex: 1, minWidth: 150 },
     { headerName: 'Location Name', field: 'LocationName', sortable: true, filter: true, flex: 1, minWidth: 150 },
+    { headerName: 'Location Id', field: 'LocationId', sortable: true,hide:true, filter: true, flex: 1, minWidth: 150 },
     {
       headerName: 'Status',
       field: 'IsActive',
       cellRenderer: params => (
         <StatusButtonCell
           value={params.value}
-          onUpdateStatus={() => handleUpdateStatus(params.data.LocationId, params.value)}
+          onUpdateStatus={() => handleUpdateStatus(params.data.AreaBuildingId, params.value)}
         />
       ),
       flex: 1,
@@ -45,25 +46,23 @@ function LocationMaster() {
       cellStyle: { textAlign: 'center' }
     },
   ]);
-
   const [gridApi, setGridApi] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null);
   const navigate = useNavigate();
 
   const handleNavigateToAddLocation = () => {
-    setCurrentLocation(null); 
-    setShowForm(true); 
+    setCurrentLocation(null);
+    setShowForm(true);
   };
-
-  useCountDetails('LocationMaster', setCountDetails);
+  useCountDetails('AreaBuilding', setCountDetails);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}GetAllLocation`)
+    fetch(`${API_BASE_URL}GetAllArea`)
       .then(response => response.json())
       .then(data => {
-        if (Array.isArray(data.LocationDetails)) {
-          setLocations(data.LocationDetails);
+        if (Array.isArray(data.AreaBuildingDetails)) {
+          setLocations(data.AreaBuildingDetails);
         } else {
           console.error('API response is not an array:', data);
           setLocations([]);
@@ -79,14 +78,13 @@ function LocationMaster() {
     setGridApi(params.api);
     params.api.paginationSetPageSize(10); // Set your desired page size
   };
-
   const handleQuickFilter = (event) => {
     if (gridApi) {
       gridApi.setQuickFilter(event.target.value);
     }
   };
 
-  const handleUpdateStatus = (locationId, currentStatus) => {
+  const handleUpdateStatus = (AreaBuildingId, currentStatus) => {
     const newStatus = currentStatus === 1 ? 0 : 1;
 
     fetch(`${API_BASE_URL}InActiveStatusChange`, {
@@ -96,8 +94,8 @@ function LocationMaster() {
       },
       body: JSON.stringify({
         IsActive: newStatus,
-        InActiveParamName: "locationMaster",
-        StatusChangeId: locationId,
+        InActiveParamName: "AreaBuilding",
+        StatusChangeId: AreaBuildingId,
         EntryBy: 0
       }),
     })
@@ -113,7 +111,7 @@ function LocationMaster() {
 
         setLocations(prevData => {
           return prevData.map(row => {
-            if (row.LocationId === locationId) {
+            if (row.AreaBuildingId === AreaBuildingId) {
               return { ...row, IsActive: newStatus };
             }
             return row;
@@ -124,34 +122,32 @@ function LocationMaster() {
         console.error('Error updating status:', error);
       });
   };
-
   const handleExport = () => {
     if (gridApi) {
       const params = {
-        columnKeys: ['LocationId', 'LocationName'],
+        columnKeys: ['AreaBuildingId', 'AreaName', 'LocationName'],
       };
       gridApi.exportDataAsCsv(params);
     }
   };
 
-  const openEditForm = (location) => {
+  const openEditForm = (area) => {
     setShowForm(true);
-    setCurrentLocation(location);
+    setCurrentLocation(area);
   };
 
-  const handleEditLocation = (location) => {
-    openEditForm(location);
+  const handleEditLocation = (area) => {
+    openEditForm(area);
   };
-
-  const onDelete = async (locationId) => {
+  const onDelete = async (AreaBuildingId) => {
     const loc = {
-      Id: locationId,
-      deleteBy: 1
+      areaBuildingId: AreaBuildingId,
+      deleteby: 1
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}DeleteLocation`, {
-        method: 'POST',
+      const response = await fetch(`${API_BASE_URL}DeleteArea`, {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -161,7 +157,7 @@ function LocationMaster() {
       const data = await response.json();
       if (data.errCode === '0') {
         alert(`Location Deleted Successfully.`);
-        setLocations(prevData => prevData.filter(row => row.LocationId !== locationId));
+        setLocations(prevData => prevData.filter(row => row.AreaBuildingId !== AreaBuildingId));
       } else {
         alert('Failed to delete location.');
       }
@@ -169,7 +165,6 @@ function LocationMaster() {
       alert('Failed to delete location. Error: ' + error.message);
     }
   };
-
   return (
     <div className="location-master-container">
       <Sidebar />
@@ -177,7 +172,7 @@ function LocationMaster() {
         <div className="header">
           <div className="location-label">Location</div>
           <div className="buttons">
-            <button onClick={handleNavigateToAddLocation} className='add-location'>Add Location</button>
+            <button onClick={handleNavigateToAddLocation} className='add-location'>Add AreaBuilding</button>
             <button className="bulk-location">Bulk Location</button>
           </div>
         </div>
@@ -227,7 +222,7 @@ function LocationMaster() {
 
       {showForm && (
         <div className="form-container">
-          <AddLocation
+          <AddAreaBuilding
             currentLocation={currentLocation}
             closeForm={() => setShowForm(false)}
           />
@@ -264,7 +259,7 @@ const StatusButtonCell = ({ value, onUpdateStatus }) => {
 
 const ActionCell = ({ data, onDelete, onEdit }) => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-    <DeleteIcon style={{ cursor: 'pointer', marginRight: '30px', color: 'red' }} onClick={() => onDelete(data.LocationId)} />
+    <DeleteIcon style={{ cursor: 'pointer', marginRight: '30px', color: 'red' }} onClick={() => onDelete(data.AreaBuildingId)} />
     <EditRoundedIcon style={{ cursor: 'pointer' }} onClick={() => onEdit(data)} />
   </div>
 );
@@ -278,5 +273,4 @@ const ActionHeader = () => (
     </span>
   </>
 );
-
-export default LocationMaster;
+export default AreaBuilding
