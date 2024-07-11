@@ -1,35 +1,32 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../assets/style/Form.css'; // Import the CSS file
 
-function Form({ onAddLocation, onCancel, LocationId, params }) {
-    const [LocationDropDown,setLocationDropDown] = useState([]);
+function Form({ onAdd, onCancel, LocationId, params }) {
+
+
+  const [LocationDropDown, setLocationDropDown] = useState([]);
+
   const [formData, setFormData] = useState({
-
     deviceSerialNo: '',
-    DeviceType:'',
-    DeviceModelName:'',
-    DeviceIp:'',
-    LocationName:0,
-    CardStatusID:0,
-    Remark:''
-
+    DeviceType: '',
+    DeviceModelName: '',
+    DeviceIp: '',
+    LocationId: 0,
+    CardStatusID: 0,
+    Remark: ''
   });
 
-
-  const BindLocation=async()=>{
-
+  const BindLocation = async () => {
     const response = await fetch('http://192.168.11.212:8070/api/dropdown/getfilllocation');
     const data = await response.json();
-    if(Array.isArray(data.LocationDetails)){
-        setLocationDropDown(data.LocationDetails);
+    if (Array.isArray(data.LocationDetails)) {
+      setLocationDropDown(data.LocationDetails);
     }
-  }
+  };
 
-
-  useEffect(()=>{
+  useEffect(() => {
     BindLocation();
-},[]);
-
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,19 +43,31 @@ function Form({ onAddLocation, onCancel, LocationId, params }) {
     let body = {};
 
     if (params === 'Location') {
-        
       url = 'http://192.168.11.212:8070/api/master/AddLocation';
       body = { LocationId: LocationId, LocationName: formData.locationName };
-    } 
-    else if (params === 'Device') {
+    } else if (params === 'DeviceMaster') {
       url = 'http://192.168.11.212:8070/api/master/AddDevice';
-      body = { DeviceSerialNo: formData.deviceSerialNo , 
-        DeviceType: formData.DeviceType ,
+      body = {
+        Id:LocationId,
+        DeviceSerialNo: formData.deviceSerialNo,
+        DeviceType: formData.DeviceType,
+        DeviceModelName: formData.DeviceModelName,
+        LocationId: Number(formData.LocationId),
+        DeviceIp: formData.DeviceIp,
+        
+      };
+    } else if (params === 'Device') {
+      url = 'http://192.168.11.212:8070/api/master/AddDevice';
+      body = {
+        DeviceSerialNo: formData.deviceSerialNo,
+        DeviceType: formData.DeviceType,
         DeviceModelName: formData.DeviceModelName,
         Remark: formData.Remark,
         CardStatusID: formData.CardStatusID,
-        LocationName: formData.LocationName,
-        DeviceIp: formData.DeviceIp};
+        LocationId: Number(formData.LocationId),
+        LocationName:"",
+        DeviceIp: formData.DeviceIp
+      };
     }
 
     try {
@@ -75,18 +84,18 @@ function Form({ onAddLocation, onCancel, LocationId, params }) {
       }
 
       const data = await response.json();
-      onAddLocation(data);
+      onAdd(data);
 
       // Clear form fields
       setFormData({
         locationName: '',
         deviceSerialNo: '',
-        DeviceType:'',
-        DeviceModelName:'',
-        DeviceIp:'',
-        LocationName:'',
-        CardStatusID:'',
-        Remark:''
+        DeviceType: '',
+        DeviceModelName: '',
+        DeviceIp: '',
+        LocationId: 0,
+        CardStatusID: 0,
+        Remark: ''
       });
     } catch (error) {
       console.error('Error adding:', error);
@@ -98,7 +107,7 @@ function Form({ onAddLocation, onCancel, LocationId, params }) {
       <form className="add-location-form" onSubmit={handleSubmit}>
         <h2>Add {params}</h2>
         <div className="form-group">
-          {params === 'Location' ? (
+          {params === 'Location' ? ( // add Location
             <>
               <label htmlFor="locationName">Location Name</label>
               <input
@@ -110,7 +119,7 @@ function Form({ onAddLocation, onCancel, LocationId, params }) {
                 required
               />
             </>
-          ) : params === 'Device' ? (
+          ) : params === 'Device' ? ( // add Device
             <>
               <label htmlFor="deviceSerialNo">Device Serial No</label>
               <input
@@ -121,7 +130,7 @@ function Form({ onAddLocation, onCancel, LocationId, params }) {
                 onChange={handleChange}
                 required
               />
-              <label htmlFor="DeviceModelName">Modal Name</label>
+              <label htmlFor="DeviceModelName">Model Name</label>
               <input
                 type="text"
                 id="DeviceModelName"
@@ -148,21 +157,24 @@ function Form({ onAddLocation, onCancel, LocationId, params }) {
                 onChange={handleChange}
                 required
               />
-              <label htmlFor="LocationName">Location</label>
+              <label htmlFor="LocationId">Location</label>
               <select
-           
-                id="LocationName"
-                name="LocationName"
-                value={formData.LocationName}
+                id="LocationId"
+                name="LocationId"
+                value={formData.LocationId}
                 onChange={handleChange}
                 required
               >
                 <option value="">Select a location</option>
-                {LocationDropDown.map((location)=>(<option key={location.LocationId} value={location.LocationId}>{location.LocationName}</option>))}
-                </select>
+                {LocationDropDown.map((location) => (
+                  <option key={location.LocationId} value={location.LocationId}>
+                    {location.LocationName}
+                  </option>
+                ))}
+              </select>
+
               <label htmlFor="CardStatusID">Device Status</label>
               <select
-             
                 id="CardStatusID"
                 name="CardStatusID"
                 value={formData.CardStatusID}
@@ -170,12 +182,12 @@ function Form({ onAddLocation, onCancel, LocationId, params }) {
                 required
               >
                 <option value="0">Select Device Status</option>
-                <option value="1">Recieved</option>
+                <option value="1">Received</option>
                 <option value="2">In Transit</option>
                 <option value="3">Allocated</option>
-                <option value="4">UnAllocated</option>
-                <option value="5">Withdraw</option>
-                  </select>  
+                <option value="4">Unallocated</option>
+                <option value="5">Withdrawn</option>
+              </select>
               <label htmlFor="Remark">Remark</label>
               <input
                 type="text"
@@ -184,7 +196,7 @@ function Form({ onAddLocation, onCancel, LocationId, params }) {
                 value={formData.Remark}
                 onChange={handleChange}
                 required
-              />  
+              />
             </>
           ) : null}
         </div>

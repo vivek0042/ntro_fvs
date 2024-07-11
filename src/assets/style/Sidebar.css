@@ -29,6 +29,7 @@
   
   .sidebar ul li {
     padding: 10px 20px;
+    color: #000;
   }
   
   .sidebar ul li a {
@@ -55,3 +56,50 @@
     color: #333;
   }
   
+
+
+
+  /* src/NavigationBar.css */
+
+/* src/NavigationBar.css */
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+ 
+  padding-bottom: 20px;
+
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo {
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-button {
+  background-color: #4B0EAE;
+  color: white;
+  border: none;
+  font-size: medium;
+  font-weight: bold;
+  border-radius: 2px;
+  height: 35px;
+  width: 150px;
+  cursor: pointer;
+  margin: 0 5px;
+
+}
+
+

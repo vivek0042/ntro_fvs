@@ -7,7 +7,9 @@ const MainLayout = ({ children }) => {
  
   return (
     <div className="main-layout sidebar-open">
+      <div>
       <Sidebar />
+      </div>
       <div className="content">
         {children}
       </div>

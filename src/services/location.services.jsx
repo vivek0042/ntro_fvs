@@ -21,7 +21,7 @@ export const fetchLocations = async () => {
 export const deleteLocation = async (locationId) => {
   try {
     const data = await post('Master/DeleteLocation', { id: locationId });
-    return data;
+    return data.DatatableCountDetails;
   } catch (error) {
     console.error('Error deleting location:', error);
     throw error;
