@@ -3,34 +3,22 @@ import { AgGridReact } from "ag-grid-react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import StatusButtonCell from "../../components/StatusButtonCell";
-import Form from "../../components/Form";
-import CountHeader from "../../components/Count";
-import {
-  fetchDevices,
-  deleteDevice,
-} from "../../services/DeviceInventory.services";
-import { fetchCards } from "../../services/Master/Card.service";
 import { updateStatus } from "../../services/common.services";
 import { useGlobalState } from "../../context/GlobalContext";
 import { toast } from 'react-toastify'
 import { get , post} from '../../services/api';
+import { InventoryCount } from "../../components/Count";
 
 const CardInventory = () => {
   const { state, dispatch } = useGlobalState();
   const {
     devices,
-    totalCount,
-    activeCount,
-    inactiveCount,
     isFormOpen,
-    selectedDeviceId,
   } = state;
 
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
-
-
+  const [InvCount, setInvCount] = useState([]);
   const [LocationDropDown, setLocationDropDown] = useState([]);
   const [formData, setFormData] = useState({
     formType:"Add",
@@ -107,6 +95,7 @@ const CardInventory = () => {
     },
   ];
   useEffect(() => {
+    InventoryCountDetail();
     fetchData();
     BindLocation();
   }, []);
@@ -120,19 +109,39 @@ const CardInventory = () => {
           dispatch({ type: "SET_DEVICES", payload: data });
         }
        
-        dispatch({
-        type: "SET_COUNTS",
-        payload: {
-        totalCount: data.length,
-        activeCount: data.filter((Card) => Card.IsActive).length,
-        inactiveCount: data.filter((Card) => !Card.IsActive).length,
-      },
-    });
+       
     } catch (error) {
         console.error('Error fetching Cards:', error);
         return [];
       }
     
+  };
+  const InventoryCountDetail = async () => {
+    const payload = {
+      ParamName: "CardInventory",
+      sDeviceSerialNo: "",
+      sLocationId: 0,
+      sCardStatusID: 0,
+      sFromDate: "",
+      sToDate: "",
+      sAreaBuildingID: 0,
+      sId: 0,
+      sDeviceId: "",
+      sDeviceModelName: "",
+      sDeviceType: "",
+      sLocationName: "",
+      sDeviceIp: "",
+      sMappingFlag: 0,
+      sRemark: "",
+      sIsActive: 0,
+      userID: "",
+      firstName: "",
+      lastName: "",
+      emailAddress: "",
+      role: 0,
+    };
+    const res = await post("Master/InventoryCountDetailsFilter", payload);
+    setInvCount(res.InventoryCountDeatils);
   };
 
   const handleQuickFilter = (event) => {
@@ -327,11 +336,7 @@ const CardInventory = () => {
         </div>
       ) : (
         <>
-          <CountHeader
-            totalCount={totalCount}
-            activeCount={activeCount}
-            inactiveCount={inactiveCount}
-          />
+           {InvCount.length != 0 && <InventoryCount count={InvCount} />}
           <div className="grid-controls">
             <label>
               <span>Search: </span>

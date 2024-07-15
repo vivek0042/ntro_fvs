@@ -6,14 +6,10 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import StatusButtonCell from "../../components/StatusButtonCell";
 import CountHeader from "../../components/Count";
-import {
-  fetchDevices,
-  deleteDevice,
-} from "../../services/DeviceInventory.services";
 import { updateStatus } from "../../services/common.services";
 import { useGlobalState } from "../../context/GlobalContext";
 import { toast } from "react-toastify";
-import { del, post } from "../../services/api";
+import { del, post ,get} from "../../services/api";
 import { InventoryCount } from "../../components/Count";
 import {
   Dialog,
@@ -34,10 +30,8 @@ const DeviceList = () => {
     isFormOpen,
     selectedDeviceId,
   } = state;
-
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
-  const [InvCount, setInvCount] = useState([]);
   const [LocationDropDown, setLocationDropDown] = useState([]);
   const [formData, setFormData] = useState({
     Id: 0,
@@ -49,24 +43,24 @@ const DeviceList = () => {
     LocationId: 0,
     formType: "Add",
   });
-
+  
   const [open, setOpen] = useState(false);
-  const [deviceToDelete, setDeviceToDelete] = useState(null);
+  const [deviceToDelete, setDeviceToDelete] = useState(0);
 
-  const handleClickOpen = (device) => {
-    setDeviceToDelete(device);
+  const handleClickOpen = (deviceId) => {
+    setDeviceToDelete(deviceId);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setDeviceToDelete(null);
+    setDeviceToDelete(0);
   };
 
   const handleConfirmDelete = async () => {
     try {
       const data = await del("Master/DeleteDevices", {
-        DeviceId: Number(deviceToDelete.Id),
+        DeviceId: Number(deviceToDelete),
         Deleteby: 0,
       });
       fetchData();
@@ -161,7 +155,7 @@ const DeviceList = () => {
           />
           <FaTrash
             style={{ marginRight: "10px", cursor: "pointer", color: "crimson" }}
-            onClick={() => handleClickOpen(params.data)}
+            onClick={() => handleClickOpen(params.data.Id)}
           />
         </>
       ),
@@ -172,42 +166,31 @@ const DeviceList = () => {
 
   useEffect(() => {
     fetchData();
-    InventoryCountDetail();
+ 
 
     BindLocation();
   }, []);
 
-  const InventoryCountDetail = async () => {
-    const payload = {
-      ParamName: "CardInventory",
-      sDeviceSerialNo: "",
-      sLocationId: 0,
-      sCardStatusID: 0,
-      sFromDate: "",
-      sToDate: "",
-      sAreaBuildingID: 0,
-      sId: 0,
-      sDeviceId: "",
-      sDeviceModelName: "",
-      sDeviceType: "",
-      sLocationName: "",
-      sDeviceIp: "",
-      sMappingFlag: 0,
-      sRemark: "",
-      sIsActive: 0,
-      userID: "",
-      firstName: "",
-      lastName: "",
-      emailAddress: "",
-      role: 0,
-    };
-    const res = await post("Master/InventoryCountDetailsFilter", payload);
-    setInvCount(res.InventoryCountDeatils);
-  };
+
 
   const fetchData = async () => {
-    const devices = await fetchDevices();
-    dispatch({ type: "SET_DEVICES", payload: devices });
+    try{
+      const data = await get('Master/GetAllDevice');
+      const devices = data.DeviceDetails;
+      dispatch({ type: "SET_DEVICES", payload: devices });
+      dispatch({
+        type: "SET_COUNTS",
+        payload: {
+          totalCount: devices.length,
+          activeCount: devices.filter((dev) => dev.IsActive).length,
+          inactiveCount: devices.filter((dev) => !dev.IsActive).length,
+        },
+      });
+      }
+      catch(error){
+        console.error('Error fetching devices:', error);
+      }
+    
   };
 
   const handleQuickFilter = (event) => {
@@ -428,8 +411,12 @@ const DeviceList = () => {
         <button className="nav-button">Import Bulk</button>
       </div>
     </nav>
-          {InvCount.length != 0 && <InventoryCount count={InvCount} />}
-
+         
+          <CountHeader
+            totalCount={totalCount}
+            activeCount={activeCount}
+            inactiveCount={inactiveCount}
+          />
           <div className="grid-controls">
             <label>
               <span>Search: </span>
