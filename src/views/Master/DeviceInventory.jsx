@@ -23,13 +23,14 @@ const DeviceInventory = () => {
   const {
     devices,
     isFormOpen,
+    LocationDropDown,
     selectedId,
   } = state;
 
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
   const [InvCount, setInvCount] = useState([]);
-  const [LocationDropDown, setLocationDropDown] = useState([]);
+  
 
   const [formData, setFormData] = useState({
     deviceSerialNo: '',
@@ -188,7 +189,7 @@ const DeviceInventory = () => {
   useEffect(() => {
     InventoryCountDetail();
     fetchData();
-    BindLocation();
+   
   }, []);
 
 //Handle Global State
@@ -204,15 +205,7 @@ const DeviceInventory = () => {
     }
       
   };
-  const BindLocation = async () => {
-    const response = await fetch(
-      "http://192.168.11.212:8070/api/dropdown/getfilllocation"
-    );
-    const data = await response.json();
-    if (Array.isArray(data.LocationDetails)) {
-      setLocationDropDown(data.LocationDetails);
-    }
-  };
+
   const InventoryCountDetail = async () => {
     const payload = {
       ParamName: "DeviceInventory",
@@ -344,7 +337,7 @@ const DeviceInventory = () => {
       fetchData();
       if (formData.formType == "Add") toast.success("Data Add successfully");
       else toast.success("Data Updated Successfully");
-
+      InventoryCountDetail();
       setFormData({
         locationName: "",
         deviceSerialNo: "",
@@ -353,6 +346,7 @@ const DeviceInventory = () => {
         DeviceIp: "",
         LocationId: 0,
       });
+
     } catch (error) {
       toast.error("Error adding:" + error);
       console.error("Error adding:", error);

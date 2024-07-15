@@ -28,11 +28,11 @@ const DeviceList = () => {
     activeCount,
     inactiveCount,
     isFormOpen,
+    LocationDropDown,
     selectedDeviceId,
   } = state;
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
-  const [LocationDropDown, setLocationDropDown] = useState([]);
   const [formData, setFormData] = useState({
     Id: 0,
     DeviceId: 0,
@@ -166,9 +166,7 @@ const DeviceList = () => {
 
   useEffect(() => {
     fetchData();
- 
-
-    BindLocation();
+    
   }, []);
 
 
@@ -255,15 +253,7 @@ const DeviceList = () => {
     });
   };
 
-  const BindLocation = async () => {
-    const response = await fetch(
-      "http://192.168.11.212:8070/api/dropdown/getfilllocation"
-    );
-    const data = await response.json();
-    if (Array.isArray(data.LocationDetails)) {
-      setLocationDropDown(data.LocationDetails);
-    }
-  };
+ 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -307,7 +297,7 @@ const DeviceList = () => {
       fetchData();
       if (formData.formType == "Add") toast.success("Data Add successfully");
       else toast.success("Data Updated Successfully");
-
+    
       setFormData({
         locationName: "",
         deviceSerialNo: "",

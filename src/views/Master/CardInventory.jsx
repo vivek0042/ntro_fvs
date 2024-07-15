@@ -1,25 +1,34 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash , FaDownload } from "react-icons/fa";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { updateStatus } from "../../services/common.services";
 import { useGlobalState } from "../../context/GlobalContext";
 import { toast } from 'react-toastify'
-import { get , post} from '../../services/api';
+import { get , post , del} from '../../services/api';
 import { InventoryCount } from "../../components/Count";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from "@mui/material";
 
 const CardInventory = () => {
   const { state, dispatch } = useGlobalState();
   const {
     devices,
     isFormOpen,
+    LocationDropDown
   } = state;
 
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
   const [InvCount, setInvCount] = useState([]);
-  const [LocationDropDown, setLocationDropDown] = useState([]);
+ 
   const [formData, setFormData] = useState({
     formType:"Add",
     CardId:0,
@@ -28,6 +37,33 @@ const CardInventory = () => {
     LocationId: 0,
     CardSerialNo: "",
   });
+
+  const [open, setOpen] = useState(false);
+  const [cardToDelete, setcardToDelete] = useState(0);
+
+  const handleClickOpen = (deviceId) => {
+    setcardToDelete(deviceId);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setcardToDelete(0);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const data = await del("Master/DeleteCardInventory", {
+        CardAllocationId: Number(cardToDelete),
+        Deleteby: 0,
+      });
+      fetchData();
+      toast.error("Delete Device Successfully");
+      handleClose();
+    } catch (error) {
+      console.error("Error deleting device:", error);
+    }
+  };
 
   const columnDefs = [
     {
@@ -88,6 +124,10 @@ const CardInventory = () => {
                })
             }}
           />
+             <FaTrash
+            style={{ marginRight: "10px", cursor: "pointer", color: "crimson" }}
+            onClick={() => handleClickOpen(params.data.Id)}
+          />
         </>
       ),
       flex: 1,
@@ -97,7 +137,7 @@ const CardInventory = () => {
   useEffect(() => {
     InventoryCountDetail();
     fetchData();
-    BindLocation();
+   
   }, []);
 
   const fetchData = async () => {
@@ -189,13 +229,6 @@ const CardInventory = () => {
       });
   };
 
-  const BindLocation = async () => {
-    const data = await get('dropdown/getfilllocation');
-
-    if (Array.isArray(data.LocationDetails)) {
-      setLocationDropDown(data.LocationDetails);
-    }
-  };
 
   useEffect(() => {}, []);
 
@@ -247,7 +280,9 @@ const CardInventory = () => {
           CardSerialNo: "",
         });
         fetchData()
-        toast.success(`Card ${formData.formType} Succesfully`);
+        InventoryCountDetail();
+        if (formData.formType == "Add") toast.success("Data Add successfully");
+        else toast.success("Data Updated Successfully");
 
     } catch (error) {
         toast.error("Error adding:" + error.message);
@@ -336,6 +371,15 @@ const CardInventory = () => {
         </div>
       ) : (
         <>
+          <nav className="navbar">
+      <div className="navbar-left">
+      <span className="navbar-logo">Card Inventory</span>
+      </div>
+      <div className="navbar-right">
+        <button className="nav-button" onClick={handleAddCard}>Add Card</button>
+        <button className="nav-button">Import Bulk</button>
+      </div>
+    </nav>
            {InvCount.length != 0 && <InventoryCount count={InvCount} />}
           <div className="grid-controls">
             <label>
@@ -347,12 +391,7 @@ const CardInventory = () => {
               />
             </label>
             <label>
-              <button className="btnDownload" onClick={handleExport}>
-                Download
-              </button>
-              <button className="btnAdd" onClick={handleAddCard}>
-                Add Card
-              </button>
+            <FaDownload style={{cursor : "pointer"}} onClick={handleExport}/>
             </label>
           </div>
           <div className="ag-theme-alpine grid-container">
@@ -374,6 +413,27 @@ const CardInventory = () => {
               />
             </div>
           </div>
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{"Delete Card"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Are you sure you want to delete this Card?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color="primary">
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
         </>
       )}
     </div>

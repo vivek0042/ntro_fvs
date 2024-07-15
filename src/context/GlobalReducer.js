@@ -20,6 +20,9 @@ export const reducer = (state, action) => {
 
       case 'TOGGLE_FORM':
         return { ...state, isFormOpen: !state.isFormOpen, selectedId: action.payload };
+
+        case 'Fill_DROPDOWN':
+          return {...state,LocationDropDown:action.payload}
       default:
         return state;
     }

@@ -21,6 +21,7 @@ function App() {
           <Route path='/Master/DeviceList' element={<DeviceList/>}/>
           <Route path="/Master/Device-Inventory" element ={<DeviceInventory/>} />
           <Route path="/Master/Card-Inventory" element ={<CardInventory/>} />
+          
           {/* Add more routes as needed */}
         </Routes>
       </MainLayout>
