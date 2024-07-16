@@ -1,0 +1,16 @@
+/* MainLayout.css */
+.main-layout {
+    display: flex;
+  }
+  
+  .content {
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .main-layout.sidebar-open .content {
+    margin-left: 250px;
+  }
+  

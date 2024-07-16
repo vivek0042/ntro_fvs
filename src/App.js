@@ -1,43 +1,35 @@
-// App.js
+// App.jsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LocationMaster from '../src/views/LocationMaster';
-import Department from '../src/views/Department';
-import Device from './views/Device';
-import DeviceInventory from './views/DeviceInventory';
-import DeviceUserMapping from './views/DeviceUserMapping';
-import CardInventory from './views/CardInventory';
-import Sidebar from './components/Sidebar';
-import './App.css';
-import { LocationProvider } from '../src/hooks/LocationContext'
-import {AddLocation,AddAreaBuilding,AddDevice} from './components/Addlocation';
-import AreaBuilding from './views/AreaBuilding';
-// import { DepartmentProvider } from '../hooks/DepartmentContext';
+import { BrowserRouter as Router,Routes, Route, Switch } from 'react-router-dom';
+import MainLayout from './components/MainLayout';
+import LocationMaster from './views/Master/LocationMaster';
+import DeviceInventory from './views/Master/DeviceInventory';
+import DeviceList from './views/Master/DeviceList';
+import CardInventory from './views/Master/CardInventory';
+
+import { ToastContainer } from 'react-toastify';
+import { GlobalStateProvider } from './context/GlobalContext';
+import 'react-toastify/dist/ReactToastify.css';
+import Department from '../src/views/Master/Department';
 
 function App() {
   return (
+    <GlobalStateProvider>
     <Router>
-      <div className="app-container1">
-        <Sidebar />
-        <div className="main-content1">
-          <LocationProvider>
-            
-              <Routes>
-                <Route path="/" element={<LocationMaster />} />
-                <Route path="/department" element={<Department />} />
-                <Route path="/addlocation" element={<AddLocation/>}/>
-                <Route path="/AreaBuilding" element={<AreaBuilding/>}/>
-                <Route path="/Device" element={<Device/>}/>
-                <Route path="/DeviceInventory" element={<DeviceInventory/>}/>
-                <Route path="/DeviceUserMapping" element={<DeviceUserMapping/>}/>
-                <Route path="/CardInventory" element={<CardInventory/>}/>
-                {/* Add more routes as needed */}
-              </Routes>
-           
-          </LocationProvider>
-        </div>
-      </div>
+      <ToastContainer />
+      <MainLayout>
+        <Routes>
+          <Route path="/Master/location-master" element ={<LocationMaster/>} />
+          <Route path='/Master/DeviceList' element={<DeviceList/>}/>
+          <Route path="/Master/Device-Inventory" element ={<DeviceInventory/>} />
+          <Route path="/Master/Card-Inventory" element ={<CardInventory/>} />
+          <Route path ="/Master/Department" element={<Department/>}/>
+          
+          {/* Add more routes as needed */}
+        </Routes>
+      </MainLayout>
     </Router>
+    </GlobalStateProvider>
   );
 }
 

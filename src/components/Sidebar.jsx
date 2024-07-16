@@ -1,36 +1,42 @@
-// Sidebar.js
-import React from 'react';
-import { Link } from 'react-router-dom';
-import '../assets/style/Sidebar.css';
-import AreaBuilding from '../views/AreaBuilding';
+// Sidebar.jsx
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import "../assets/style/Sidebar.css"; // Import CSS for sidebar styling
 
 const Sidebar = () => {
   return (
-    <div className="sidebar">
-      <ul className="sidebar-list">
-        <li className="sidebar-item">
-          <Link to="/" className='item-1'>Location Master</Link>
-        </li>
-        <li className="sidebar-item">
-          <Link to="/department">Department</Link>
-        </li>
-        <li className="sidebar-item">
-          <Link to="/AreaBuilding">AreaBuilding</Link>
-        </li>
-        <li className="sidebar-item">
-          <Link to="/Device">Device</Link>
-        </li>
-        <li className='sidebar-item'>
-          <Link to="/DeviceInventory">Deviceinventory</Link>
-        </li>
-        <li className='sidebar-item'>
-          <Link to="/DeviceUserMapping">DeviceUserMapping</Link>
-        </li>
-        <li className='sidebar-item'>
-          <Link to="/CardInventory">CardInventory</Link>
-        </li>
-      </ul>
-    </div>
+    <>
+      <div className="sidebar">
+        <h2>NTRO</h2>
+        <ul>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          
+          <li>
+            <ul>
+          Master
+            <li>
+              <Link to="/Master/location-master">Location Master</Link>
+            </li>
+            <li>
+              <Link to="/Master/DeviceList">Device List</Link>
+            </li>
+            <li>
+              <Link to="/Master/Device-Inventory">Device Inventory</Link>
+            </li>
+            <li>
+              <Link to="/Master/Card-Inventory">Card Inventory</Link>
+            </li>
+            <li>
+              <Link to="/Master/Department">Department</Link>
+            </li>
+            </ul>
+          </li>
+          {/* Add more navigation links as needed */}
+        </ul>
+      </div>
+    </>
   );
 };
 
