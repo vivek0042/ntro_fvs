@@ -31,6 +31,12 @@ const Sidebar = () => {
             <li>
               <Link to="/Master/Department">Department</Link>
             </li>
+            <li>
+              <Link to="/Master/AreaBuilding">AreaBuilding</Link>
+            </li>
+            <li>
+              <Link to="/Master/CompanyProfile">CompanyProfile</Link>
+            </li>
             </ul>
           </li>
           {/* Add more navigation links as needed */}

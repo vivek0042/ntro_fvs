@@ -5,15 +5,19 @@ const GlobalStateContext = createContext();
 
 const initialState = {
   devices: [],
-  TableData:[],
+  TableData: [],
   locations: [],
-  LocationDropDown:[],
+  LocationDropDown: [],
   totalCount: 0,
   activeCount: 0,
   inactiveCount: 0,
   isFormOpen: false,
   selectedId: null,
+  isContactFormOpen: false,
+  selectedCompanyId: null,
+  selectedContact:[],
 };
+
 
 
 export const GlobalStateProvider = ({ children }) => {

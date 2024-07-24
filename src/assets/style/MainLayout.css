@@ -13,4 +13,63 @@
   .main-layout.sidebar-open .content {
     margin-left: 250px;
   }
+  /* This is for contact information - boxes */
+  .parent-wrapper {
+    padding-bottom: 20px; /* Ensure there's space at the bottom */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the wrapper covers the full viewport height */
+    box-sizing: border-box;
+  }
+  
+  .parent-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px; /* Space between the grid and the bottom of the parent wrapper */
+    padding-bottom: 20px; /* Add padding to ensure boxes are not cut off */
+  }
+  
+  .box {
+    margin-top: 20px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 8px; 
+    background-color: #fff; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  }
+  
+  .header {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    gap: 20px; /* Space between the logo and the text */
+  }
+  
+  .header img {
+    height: 150px; /* Adjust the size of the logo */
+    width: auto; /* Maintain aspect ratio */
+  }
+  
+  .header .company-info {
+    display: flex;
+    flex-direction: column; /* Stack text elements vertically */
+  }
+  
+  .header .company-info h1,
+  .header .company-info h2,
+  .header .company-info h3 {
+    margin: 0; /* Remove default margins */
+  }
+  
+  .header .edit-icon {
+    margin-left: auto; /* Push the edit icon to the far right */
+    cursor: pointer;
+    color: skyblue;
+    height:20px;
+  }
+
+  #addcontactbutton{
+    margin-top: 10px;
+  }
+  
   
