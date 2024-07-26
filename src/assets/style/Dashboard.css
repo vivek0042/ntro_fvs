@@ -1,0 +1,63 @@
+.LocationDropdownContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.LocationDropdownDevice, .LocationDropdownCard {
+    display: flex;
+    justify-content: center; 
+    margin: 10px; 
+    flex: 1;
+    max-width: 45%; 
+}
+.LocationDropdownDevice select, .LocationDropdownCard select {
+    border: 2px solid #5C95FF; 
+    border-radius: 4px; 
+    padding: 8px; 
+    width: 100%; 
+    box-sizing: border-box; 
+    font-size: 16px; 
+    background-color: #fff; 
+    color: #333; 
+}
+.AllCharts {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+}
+
+.ChartRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.ChartItem {
+    flex: 1;
+    max-width: 48%;
+    position: relative;
+}
+
+.ChartItem canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.card-link {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.card-link:hover {
+    text-decoration: underline;
+}
+
+/* Ensure no overflow on large screens */
+body {
+    overflow:auto;
+}

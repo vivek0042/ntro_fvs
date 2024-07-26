@@ -37,6 +37,9 @@ const Sidebar = () => {
             <li>
               <Link to="/Master/CompanyProfile">CompanyProfile</Link>
             </li>
+            <li>
+              <Link to="/Master/AdminDashboard">AdminDashboard</Link>
+            </li>
             </ul>
           </li>
           {/* Add more navigation links as needed */}

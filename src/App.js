@@ -13,6 +13,7 @@ import { GlobalStateProvider } from './context/GlobalContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Department from '../src/views/Master/Department';
 import CompanyProfile from './views/Master/CompanyProfile';
+import AdminDashboard from './views/Master/AdminDashboard';
 
 function App() {
   return (
@@ -27,7 +28,8 @@ function App() {
           <Route path="/Master/Card-Inventory" element ={<CardInventory/>} />
           <Route path ="/Master/Department" element={<Department/>}/>
           <Route path="/Master/AreaBuilding" element={<AreaBuilding/>}/>
-          <Route path="Master/CompanyProfile" element = {<CompanyProfile/>}/>
+          <Route path="/Master/CompanyProfile" element = {<CompanyProfile/>}/>
+          <Route path="/Master/AdminDashboard" element = {<AdminDashboard/>}/>
           {/* Add more routes as needed */}
         </Routes>
       </MainLayout>
