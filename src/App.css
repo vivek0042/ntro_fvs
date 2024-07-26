@@ -153,3 +153,89 @@ html, body {
   padding: 4px 0;
   margin-top: -5px;
 }
+
+
+.selectrole_header label.control-label {
+  min-width: 80px;
+}
+
+.role_head {
+  background-color: #EFF0F1;
+  padding: 5px 12px;
+  color: #210154;
+  font-weight: 600;
+}
+.row {
+  --bs-gutter-x: 1.5rem;
+  --bs-gutter-y: 0;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: calc(-1* var(--bs-gutter-y));
+  margin-right: calc(-.5* var(--bs-gutter-x));
+  margin-left: calc(-.5* var(--bs-gutter-x));
+}
+.col {
+  flex: 1 0 0%;
+}
+.text-center {
+  text-align: center !important;
+}
+
+.role_body {
+  height: calc(100vh - 125px);
+  overflow: auto;
+}
+
+  .role_body .roletab_head {
+      background-color: #F5F6F7;
+      padding: 9px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #210154;
+      display: flex;
+      flex-direction: row;
+  }
+  .roletab_box{
+    margin-bottom: 2px;
+  }
+  .role_body .roletab_data {
+      padding: 10px 10px;
+      border: 1px solid #eff0f1;
+  }
+
+      .role_body .roletab_data .form_box {
+          padding: 5px 10px;
+          border-bottom: 1px solid #eff0f1;
+          font-size: 16px;
+          color: #4B0EAE;
+         
+      }
+
+          .role_body .roletab_data .form_box:last-child {
+              border-bottom: 0;
+          }
+
+.roletab_head .form-check {
+  width: 24.3%;
+  padding-left: 0;
+}
+
+.form-check-input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px !important;
+}
+
+  .form-check-input:checked {
+      background-color: #4B0EAE;
+      border-color: #4B0EAE;
+  }
+
+  .form-check-input:focus {
+      outline: 0;
+      box-shadow: 0 0 0 0.25rem rgba(75, 14, 174, 0.20);
+  }
+
+.form-check .form-check-label {
+  padding-left: 8px;
+}

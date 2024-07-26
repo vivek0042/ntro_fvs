@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,6 +14,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { toast } from 'react-toastify';
+import { post } from '../services/api';
 
 function Copyright(props) {
   return (
@@ -27,17 +31,74 @@ function Copyright(props) {
 }
 
 // TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 export default function SignIn() {
-  const handleSubmit = (event) => {
+  const Navigate =useNavigate();
+  const [captcha, setCaptcha] = useState("");
+  const [formData, setFormData] = useState({
+    userid: "",
+    password: "",
+    remember: false,
+    captcha: ""
+  });
+
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
+
+  function generateCaptcha() {
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let captcha = '';
+    for (let i = 0; i < 6; i++) {
+      captcha += chars[Math.floor(Math.random() * chars.length)];
+    }
+    setCaptcha(captcha);
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    const req = {
+      UserName: formData.userid,
+      Password: formData.password,
+      RememberMe: Boolean(formData.remember)
+    };
+    const Entcaptcha = formData.captcha;
+
+    if (Entcaptcha !== captcha) {
+      toast.error("Invalid Captcha");
+      setFormData({
+        userid: "",
+        password: "",
+        remember: false,
+        captcha: ""
+      });
+      generateCaptcha()
+      return;
+    }
+
+    const response = await post('Account/UserLogin', req);
+    
+    if(response.errCode== "0"){
+      Navigate("DashBoard/AdminDashBoard");
+    }
+    console.log(response);
+    setFormData({
+      userid: "",
+      password: "",
+      remember: false,
+      captcha: ""
     });
+    generateCaptcha()
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
   return (
@@ -63,10 +124,12 @@ export default function SignIn() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="userid"
+              label="User Id"
+              value={formData.userid}
+              onChange={handleChange}
+              name="userid"
+              autoComplete="userid"
               autoFocus
             />
             <TextField
@@ -77,10 +140,34 @@ export default function SignIn() {
               label="Password"
               type="password"
               id="password"
+              value={formData.password}
+              onChange={handleChange}
               autoComplete="current-password"
             />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="captcha"
+              label="Captcha"
+              id="captcha"
+              onChange={handleChange}
+              value={formData.captcha}
+              autoComplete="captcha"
+              sx={{ width: 150 }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="captchacode"
+              id="captchacode"
+              value={captcha}
+              sx={{ width: 150 }}
+              disabled
+            />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={<Checkbox name="remember" id='remember' checked={formData.remember} onChange={handleChange} color="primary" />}
               label="Remember me"
             />
             <Button
@@ -97,11 +184,7 @@ export default function SignIn() {
                   Forgot password?
                 </Link>
               </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
+              
             </Grid>
           </Box>
         </Box>

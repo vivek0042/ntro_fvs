@@ -113,7 +113,7 @@ const CardInventory = () => {
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
-              dispatch({ type: "TOGGLE_FORM", payload: params.data.CardId }) 
+              dispatch({ type: "TOGGLE_FORM"}) 
               setFormData({
                 formType:"Update",
                 CardId : params.data.CardId,
@@ -135,11 +135,20 @@ const CardInventory = () => {
     },
   ];
   useEffect(() => {
+    BindLocation();
     InventoryCountDetail();
     fetchData();
    
   }, []);
 
+  const BindLocation = async () => {
+    const data = await get('dropdown/getfilllocation');
+
+    if (Array.isArray(data.LocationDetails)) {
+      dispatch({type:'Fill_DROPDOWN',payload:data.LocationDetails});
+      
+    }
+  };
   const fetchData = async () => {
     try {
     const Cards = await get('Master/GetCardInventory');

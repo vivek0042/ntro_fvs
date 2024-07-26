@@ -40,6 +40,7 @@
     font-size: 14px;
     transition: border-color 0.3s;
   }
+
   .form-group select {
     width: 100%;
     padding: 10px;
@@ -85,3 +86,77 @@
     background-color: #c82333;
   }
   
+
+ /* report */
+
+ .form-wrapper {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-report-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.user-report-container .form-group {
+  margin-bottom: 15px;
+}
+
+.form-control-custom {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  margin-top: 5px;
+}
+
+.btn-custom {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  display: inline-block;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-custom:hover {
+  background-color: #0056b3;
+}
+
+.card-wrapper {
+  display: inline-block;
+  width: 30%;
+  margin: 10px;
+}
+
+.card-custom {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: white;
+}
+
+.card-header-custom {
+  background-color: #f8f9fa;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+}
+
+.card-body-custom {
+  padding: 15px;
+}
+
+.card-title-custom {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.card-text-custom {
+  margin-bottom: 15px;
+}

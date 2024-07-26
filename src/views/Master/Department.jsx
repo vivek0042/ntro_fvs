@@ -22,7 +22,7 @@ const CardInventory = () => {
     activeCount,
     inactiveCount,
     isFormOpen,
-    selectedDeviceId,
+  
   } = state;
 
   const [pageSize, setPageSize] = useState(10);
@@ -83,7 +83,7 @@ const CardInventory = () => {
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
-              dispatch({ type: "TOGGLE_FORM", payload: params.data.CardId });
+              dispatch({ type: "TOGGLE_FORM" });
             }}
           />
         </>
@@ -191,7 +191,7 @@ const CardInventory = () => {
 
     let url = "http://192.168.11.212:8070/api/master/AddCardInventory";
     let body = {
-      CardId:selectedDeviceId,
+  
       CardSerialNo: formData.CardSerialNo,
       LocationId: Number(formData.LocationId),
       CardStatus: Number(formData.CardStatus),

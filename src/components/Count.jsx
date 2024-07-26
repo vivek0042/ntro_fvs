@@ -51,3 +51,29 @@ export  function InventoryCount({count}){
   );
 }
 
+export  function InventoryCardCount({count}){
+
+  
+  return(
+    <div className="page_header d-flex align-items-center justify-content-between pt-2 pb-2">
+     
+      <div className="pagehead_btn d-flex align-items-center">
+        <div className="Invcount">
+          <span>Functional: {count[0].totalCountActiveInActive}</span>
+        </div>
+        <div className="Invcount">
+          <span>Non Functional: {count[0].inActiveCount}</span>
+        </div>
+        <div className="Invcount">
+          <span>Wear & Tear: 0</span>
+        </div>
+        <div className="Invcount">
+          <span>Lost: 0</span>
+        </div>
+        
+      
+      </div>
+    </div>
+  );
+}
+

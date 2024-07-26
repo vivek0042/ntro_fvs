@@ -32,7 +32,7 @@ function LocationMaster() {
     activeCount,
     inactiveCount,
     isFormOpen,
-    selectedId,
+ 
   } = state;
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
@@ -113,7 +113,10 @@ function LocationMaster() {
 
   const handleUpdateStatus = async (locationId, newStatus) => {
     try {
-      await updateStatus(locationId, newStatus, "LocationMaster");
+      const data=await updateStatus(locationId, newStatus, "LocationMaster");
+      if (data.errCode == "1") toast.error("Unable to Inactive location.There are associated records in CardInventory.");
+      else if (newStatus == 1) toast.success("Activated Successfully");
+      else if (newStatus == 0) toast.error("Deactivate Successfully");
       fetchData();
     } catch (error) {
       console.error("Error updating status:", error);
@@ -157,7 +160,7 @@ function LocationMaster() {
 
   const handleConfirmDelete = async () => {
     try {
-      const data = await del("Master/DeleteLocation", {
+      const data = await post("Master/DeleteLocation", {
         Id: Number(LocationToDelete),
         Deleteby: 0,
       });

@@ -24,7 +24,7 @@ const DeviceInventory = () => {
     devices,
     isFormOpen,
     LocationDropDown,
-    selectedId,
+ 
   } = state;
 
   const [pageSize, setPageSize] = useState(10);
@@ -160,7 +160,7 @@ const DeviceInventory = () => {
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
-              dispatch({ type: "TOGGLE_FORM", payload: params.data.Id });
+              dispatch({ type: "TOGGLE_FORM" });
               setFormData({
                 Id: params.data.Id,
                 DeviceId: params.data.DeviceId,
@@ -188,12 +188,20 @@ const DeviceInventory = () => {
 
   useEffect(() => {
     InventoryCountDetail();
+    BindLocation();
     fetchData();
    
   }, []);
 
 //Handle Global State
+const BindLocation = async () => {
+  const data = await get('dropdown/getfilllocation');
 
+  if (Array.isArray(data.LocationDetails)) {
+    dispatch({type:'Fill_DROPDOWN',payload:data.LocationDetails});
+    
+  }
+};
   const fetchData = async () => {
     try{
     const data = await get('Master/GetAllDevice');
@@ -305,34 +313,20 @@ const DeviceInventory = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    let url = "http://192.168.11.212:8070/api/master/AddDevice";
-    let body = {
-      Id: Number(formData.Id),
-      DeviceId: Number(formData.DeviceId),
-      DeviceSerialNo: formData.deviceSerialNo,
-      DeviceType: formData.DeviceType,
-      DeviceModelName: formData.DeviceModelName,
-      LocationId: Number(formData.LocationId),
-      DeviceIp: formData.DeviceIp,
-      LocationName: "",
-      Remark: formData.Remark,
-      CardStatusID : formData.CardStatusID
-    };
-
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
+      const response = await post("master/AddDevice", {
+        Id: Number(formData.Id),
+        DeviceId: Number(formData.DeviceId),
+        DeviceSerialNo: formData.deviceSerialNo,
+        DeviceType: formData.DeviceType,
+        DeviceModelName: formData.DeviceModelName,
+        LocationId: Number(formData.LocationId),
+        DeviceIp: formData.DeviceIp,
+        LocationName: "",
+        Remark: formData.Remark,
+        CardStatusID : formData.CardStatusID
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to add");
-      }
-
-      const data = await response.json();
       handleAddDevice();
       fetchData();
       if (formData.formType == "Add") toast.success("Data Add successfully");

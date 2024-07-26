@@ -8,7 +8,7 @@ export const updateStatus = async (Id, newStatus , params) => {
         StatusChangeId: Id,
         EntryBy: 1,
       });
-   
+      
       return data;
     } catch (error) {
       console.error('Error updating status:', error);
