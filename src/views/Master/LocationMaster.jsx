@@ -1,14 +1,10 @@
 // src/pages/LocationMaster.js
 import React, { useState, useEffect, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { FaEdit, FaTrash ,FaDownload } from "react-icons/fa";
+import { FaEdit, FaTrash, FaDownload } from "react-icons/fa";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import "../../assets/style/Location.css";
-import {
-  fetchLocations,
-  deleteLocation,
-} from "../../services/location.services";
 import { updateStatus } from "../../services/common.services";
 import StatusButtonCell from "../../components/StatusButtonCell";
 import CountHeader from "../../components/Count";
@@ -23,7 +19,7 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
-
+import { Link } from "react-router-dom";
 function LocationMaster() {
   const { state, dispatch } = useGlobalState();
   const {
@@ -32,7 +28,7 @@ function LocationMaster() {
     activeCount,
     inactiveCount,
     isFormOpen,
- 
+    RoleRights,
   } = state;
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
@@ -41,6 +37,12 @@ function LocationMaster() {
     LocationId: 0,
     formType: "Add",
   });
+  const obj = RoleRights.filter(
+    (item) =>
+      item.ActionUrl == "/master/LocationMaster" &&
+      item.OperationName == "Location"
+  );
+  console.log(obj);
   const [columnDefs] = useState([
     {
       headerName: "Location Name",
@@ -67,21 +69,33 @@ function LocationMaster() {
     {
       cellRenderer: (params) => (
         <>
-          <FaEdit
-            style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
-            onClick={() => {
-              dispatch({ type: "TOGGLE_FORM" });
-              setFormData({
-                LocationId: params.data.LocationId,
-                locationName: params.data.LocationName,
-                formType: "Update",
-              });
-            }}
-          />
-          <FaTrash
-            style={{ marginRight: "10px", cursor: "pointer", color: "crimson" }}
-            onClick={() => handleClickOpen(params.data.LocationId)}
-          />
+          {obj[0].CanEdit && (
+            <FaEdit
+              style={{
+                marginRight: "20px",
+                cursor: "pointer",
+                color: "skyblue",
+              }}
+              onClick={() => {
+                dispatch({ type: "TOGGLE_FORM" });
+                setFormData({
+                  LocationId: params.data.LocationId,
+                  locationName: params.data.LocationName,
+                  formType: "Update",
+                });
+              }}
+            />
+          )}
+          {obj[0].CanDelete && (
+            <FaTrash
+              style={{
+                marginRight: "10px",
+                cursor: "pointer",
+                color: "crimson",
+              }}
+              onClick={() => handleClickOpen(params.data.LocationId)}
+            />
+          )}
         </>
       ),
       flex: 1,
@@ -113,8 +127,11 @@ function LocationMaster() {
 
   const handleUpdateStatus = async (locationId, newStatus) => {
     try {
-      const data=await updateStatus(locationId, newStatus, "LocationMaster");
-      if (data.errCode == "1") toast.error("Unable to Inactive location.There are associated records in CardInventory.");
+      const data = await updateStatus(locationId, newStatus, "LocationMaster");
+      if (data.errCode == "1")
+        toast.error(
+          "Unable to Inactive location.There are associated records in CardInventory."
+        );
       else if (newStatus == 1) toast.success("Activated Successfully");
       else if (newStatus == 0) toast.error("Deactivate Successfully");
       fetchData();
@@ -253,7 +270,7 @@ function LocationMaster() {
         </div>
       ) : (
         <>
-          <nav className="navbar">
+          {/* <nav className="navbar">
             <div className="navbar-left">
               <span className="navbar-logo">Location</span>
             </div>
@@ -263,7 +280,27 @@ function LocationMaster() {
               </button>
               <button className="nav-button">Import Location</button>
             </div>
-          </nav>
+          </nav> */}
+          <div className="page_header d-flex align-items-center justify-content-between pt-2 pb-2">
+            <h2 className="page_title">Location</h2>
+            <div className="pagehead_btn d-flex align-items-center">
+              {obj[0].CanAdd && (
+                <Link
+                  className="primary_btn sprite add_btn me-1"
+                  id="btnAddLocation"
+                  onClick={handleAddLocation}
+                >
+                  Add Location
+                </Link>
+              )}
+              <Link
+                className="trans_btn_bg sprite import_btn me-1"
+                to="/BulkUpload/ImportbulkLocation"
+              >
+                Import Location
+              </Link>
+            </div>
+          </div>
           <CountHeader
             totalCount={totalCount}
             activeCount={activeCount}
@@ -289,7 +326,10 @@ function LocationMaster() {
               />
             </label>
             <label>
-            <FaDownload style={{cursor : "pointer"}} onClick={handleExport}/>
+              <FaDownload
+                style={{ cursor: "pointer" }}
+                onClick={handleExport}
+              />
             </label>
           </div>
           <div className="ag-theme-alpine grid-container">

@@ -28,7 +28,10 @@ export const reducer = (state, action) => {
         ...state,
         [action.payload.name]: action.payload.value,
       };
-
+    case "CONFIG_FORM":
+      return {...state, configMenu:action.payload}
+    case "ROLE_RIGHT":
+      return {...state,RoleRights:action.payload}
     default:
       return state;
   }

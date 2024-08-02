@@ -9,7 +9,7 @@ import { updateStatus } from "../../services/common.services";
 import { useGlobalState } from "../../context/GlobalContext";
 import { toast } from "react-toastify";
 import { del, post, get } from "../../services/api";
-
+import { Link } from "react-router-dom";
 const UserRolePermission = () => {
   const { state, dispatch } = useGlobalState();
   const { TableData, isFormOpen, LocationDropDown } = state;
@@ -105,7 +105,8 @@ const UserRolePermission = () => {
 
       if (deleteResponse != null) {
         // Prepare data to add new role permissions
-        TableData.forEach(async(item) => {
+        const msg="";
+        TableData.forEach(async (item) => {
           if (
             item.CanView ||
             item.CanAdd ||
@@ -133,16 +134,24 @@ const UserRolePermission = () => {
               MenuFlage: item.MenuFlage || false,
             };
 
-            const addResponse =await post("UserMaster/AddUserRolePerMission", req);
+            const addResponse = await post(
+              "UserMaster/AddUserRolePerMission",
+              req
+            );
 
             if (addResponse.errCode === "1001") {
-              toast.success("Rights Updated Successfully!");
+             
             } else {
-              toast.error(addResponse.errInfo);
+             msg=addResponse.errInfo;
             }
           }
+        
         });
-
+        if(msg==""){
+         
+            toast.success("Rights Updated Successfully!");
+         
+        }
         // Add new role permissions
 
         // Fetch the updated role permissions
@@ -183,24 +192,58 @@ const UserRolePermission = () => {
   return (
     <>
       <div className="content-inner">
+        <div className="page_header d-flex align-items-center justify-content-between">
+          <div className="d-flex">
+            <Link to="/UserMaster/UserRole">
+              <h2 className="page_title_sub">User Role</h2>
+            </Link>
+            <Link to="/UserMaster/User">
+              <h2 className="page_title_sub">User</h2>
+            </Link>
+            <Link to="/UserMaster/UserRolePermission">
+              <h2 className="page_title_sub active">Role Permission</h2>
+            </Link>
+          </div>
+        </div>
         <form>
           <div>
-            <div>
-              <label>Select Role</label>
-              <select
-                id="RoleId"
-                name="RoleId"
-                value={formData.RoleId}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select a Role</option>
-                {LocationDropDown.map((location) => (
-                  <option key={location.RoleId} value={location.RoleId}>
-                    {location.RoleName}
-                  </option>
-                ))}
-              </select>
+            <div className="selectrole_header">
+              <div className="d-flex justify-content-between align-items-end">
+                <div className="col-3">
+                  <div className="form-group d-flex align-items-center">
+                    <label className="control-label">Select Role</label>
+                    <select
+                      id="RoleId"
+                      name="RoleId"
+                      value={formData.RoleId}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select a Role</option>
+                      {LocationDropDown.map((location) => (
+                        <option key={location.RoleId} value={location.RoleId}>
+                          {location.RoleName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="d-flex">
+                  {/* <button class="btn trans_btn" id="btnreset">
+                    Reset
+                  </button> */}
+          
+                  <button
+                    id="btnRolePermission"
+                    className="btn primary_btn login-btn ms-3"
+                    name="Command"
+                    onClick={handleSaveChanges}
+                    value="Save"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
             </div>
             <div>
               <div className="role_head">
@@ -374,15 +417,7 @@ const UserRolePermission = () => {
                   );
                 })}
               </div>
-              <div className="text-center mt-3">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleSaveChanges}
-                >
-                  Save Changes
-                </button>
-              </div>
+             
             </div>
           </div>
         </form>

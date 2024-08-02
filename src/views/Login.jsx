@@ -16,6 +16,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { toast } from 'react-toastify';
 import { post } from '../services/api';
+import { useCookies } from 'react-cookie';
 
 function Copyright(props) {
   return (
@@ -30,12 +31,12 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function SignIn() {
-  const Navigate =useNavigate();
+  const Navigate = useNavigate();
   const [captcha, setCaptcha] = useState("");
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const [formData, setFormData] = useState({
     userid: "",
     password: "",
@@ -64,7 +65,7 @@ export default function SignIn() {
       RememberMe: Boolean(formData.remember)
     };
     const Entcaptcha = formData.captcha;
-
+  
     if (Entcaptcha !== captcha) {
       toast.error("Invalid Captcha");
       setFormData({
@@ -73,25 +74,50 @@ export default function SignIn() {
         remember: false,
         captcha: ""
       });
-      generateCaptcha()
+      generateCaptcha();
       return;
     }
-
+  
     const response = await post('Account/UserLogin', req);
-    
-    if(response.errCode== "0"){
-      Navigate("DashBoard/AdminDashBoard");
-    }
-    console.log(response);
     setFormData({
       userid: "",
       password: "",
       remember: false,
       captcha: ""
     });
-    generateCaptcha()
+    generateCaptcha();
+    if (response.errCode === "106") {
+      toast.error("UserName/Password is Incorrect");
+      return;
+    }
+    if (response.cardType === 2 || response.cardType === 3) {
+      toast.error("You have no Access, Please Contact the administrator");
+    } else if (response.isActive === false) {
+      toast.error("User is inactive, Please Contact the administrator");
+    } else if (response.isLock === 1) {
+      toast.error("User is Locked, Please Contact the administrator");
+    }
+  
+    if (response.errCode === "0") {
+      const options = {
+        path: '/',
+        expires: new Date(Date.now() + 60 * 60 * 1000) // 1 hour from now
+      };
+  
+      setCookie('loginId', response.userid, options);
+      setCookie('userroleid', response.userRole, options);
+      setCookie('UserId', response.userName, options);
+      setCookie('Name', response.name, options);
+      setCookie('Cardtype', response.cardType, options);
+      setCookie('AuthType', response.authType, options);
+      setCookie('ADIDUser', response.adid, options);
+      setCookie('RoleName', response.roleName, options);
+      setCookie('CardSerialNo', response.cardSerialNo, options);
+      setCookie('Mcsn', response.mcsn, options);
+      Navigate("DashBoard/AdminDashBoard");
+    } 
+    console.log(response);
   };
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -99,6 +125,16 @@ export default function SignIn() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  const handleLogout = () => {
+    // To remove all cookies
+    Object.keys(cookies).forEach(cookieName => {
+      removeCookie(cookieName, { path: '/' });
+    });
+
+    // Redirect to the login page or home page after logout
+    Navigate('/');
   };
 
   return (
@@ -184,9 +220,16 @@ export default function SignIn() {
                   Forgot password?
                 </Link>
               </Grid>
-              
             </Grid>
           </Box>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleLogout}
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Logout
+          </Button>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>

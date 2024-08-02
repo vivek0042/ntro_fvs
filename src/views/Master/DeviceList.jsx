@@ -29,8 +29,13 @@ const DeviceList = () => {
     inactiveCount,
     isFormOpen,
     LocationDropDown,
-   
+    RoleRights
   } = state;
+  const obj = RoleRights.filter(
+    (item) =>
+      item.ActionUrl == "/master/DeviceMaster" &&
+      item.OperationName == "Device List"
+  );
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
   const [formData, setFormData] = useState({
@@ -137,6 +142,7 @@ const DeviceList = () => {
     {
       cellRenderer: (params) => (
         <>
+         {obj[0].CanEdit && (
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
@@ -152,11 +158,12 @@ const DeviceList = () => {
                 formType: "Update",
               });
             }}
-          />
+          />)}
+             {obj[0].CanDelete && (
           <FaTrash
             style={{ marginRight: "10px", cursor: "pointer", color: "crimson" }}
             onClick={() => handleClickOpen(params.data.Id)}
-          />
+          />)}
         </>
       ),
       flex: 1,
@@ -392,7 +399,8 @@ const DeviceList = () => {
       <span className="navbar-logo">Device List</span>
       </div>
       <div className="navbar-right">
-        <button className="nav-button" onClick={handleAddDevice}>Add Device</button>
+      {obj[0].CanAdd && (
+        <button className="nav-button" onClick={handleAddDevice}>Add Device</button>)}
         <button className="nav-button">Import Bulk</button>
       </div>
     </nav>

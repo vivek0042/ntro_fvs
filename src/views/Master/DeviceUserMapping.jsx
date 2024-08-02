@@ -26,6 +26,7 @@ const DeviceUserMapping = () => {
     TableData,
     isFormOpen,
     LocationDropDown,  
+    RoleRights
   } = state;
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
@@ -35,7 +36,11 @@ const DeviceUserMapping = () => {
     MappingId:0,
     formType: "Add",
   });
-  
+  const obj = RoleRights.filter(
+    (item) =>
+      item.ActionUrl == "/master/DeviceUserMapping" &&
+      item.OperationName == "Device User Mapping"
+  );
   const [open, setOpen] = useState(false);
   const [mappingToDelete, setmappingToDelete] = useState(0);
 
@@ -97,6 +102,7 @@ const DeviceUserMapping = () => {
     {
       cellRenderer: (params) => (
         <>
+         {obj[0].CanEdit && (
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
@@ -108,11 +114,12 @@ const DeviceUserMapping = () => {
                 formType: "Update",
               });
             }}
-          />
+          />)}
+             {obj[0].CanDelete && (
           <FaTrash
             style={{ marginRight: "10px", cursor: "pointer", color: "crimson" }}
             onClick={() => handleClickOpen(params.data.MappingId)}
-          />
+          />)}
         </>
       ),
       flex: 1,
@@ -280,7 +287,8 @@ const DeviceUserMapping = () => {
       <span className="navbar-logo">Device Mapping</span>
       </div>
       <div className="navbar-right">
-        <button className="nav-button" onClick={handleAddDevice}>Map Device</button>
+      {obj[0].CanAdd && (
+        <button className="nav-button" onClick={handleAddDevice}>Map Device</button>)}
         <button className="nav-button">Import Bulk</button>
       </div>
     </nav>

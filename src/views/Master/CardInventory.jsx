@@ -16,19 +16,24 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
-
+import { Link } from "react-router-dom";
 const CardInventory = () => {
   const { state, dispatch } = useGlobalState();
   const {
     devices,
     isFormOpen,
-    LocationDropDown
+    LocationDropDown,
+    RoleRights
   } = state;
 
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
   const [InvCount, setInvCount] = useState([]);
- 
+  const obj = RoleRights.filter(
+    (item) =>
+      item.ActionUrl == "/master/CardInventoryMaster" &&
+      item.OperationName == "CardInventoryMaster"
+  );
   const [formData, setFormData] = useState({
     formType:"Add",
     CardId:0,
@@ -110,6 +115,7 @@ const CardInventory = () => {
     {
       cellRenderer: (params) => (
         <>
+           {obj[0].CanEdit && (
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
@@ -123,11 +129,12 @@ const CardInventory = () => {
                 CardSerialNo: params.data.Mcsn
                })
             }}
-          />
+          />)}
+             {obj[0].CanDelete && (
              <FaTrash
             style={{ marginRight: "10px", cursor: "pointer", color: "crimson" }}
             onClick={() => handleClickOpen(params.data.Id)}
-          />
+          />)}
         </>
       ),
       flex: 1,
@@ -385,10 +392,12 @@ const CardInventory = () => {
       <span className="navbar-logo">Card Inventory</span>
       </div>
       <div className="navbar-right">
-        <button className="nav-button" onClick={handleAddCard}>Add Card</button>
+      {obj[0].CanAdd && (
+        <button className="nav-button" onClick={handleAddCard}>Add Card</button>)}
         <button className="nav-button">Import Bulk</button>
       </div>
     </nav>
+   
            {InvCount.length != 0 && <InventoryCount count={InvCount} />}
           <div className="grid-controls">
             <label>

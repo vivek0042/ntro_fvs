@@ -9,10 +9,10 @@ import { updateStatus } from "../../services/common.services";
 import { useGlobalState } from "../../context/GlobalContext";
 import { toast } from "react-toastify";
 import { del, post, get } from "../../services/api";
-
+import { Link } from "react-router-dom";
 const UserRole = () => {
   const { state, dispatch } = useGlobalState();
-  const { TableData, isFormOpen, LocationDropDown } = state;
+  const { TableData, isFormOpen, RoleRights } = state;
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
   const [formData, setFormData] = useState({
@@ -22,7 +22,11 @@ const UserRole = () => {
     AuthType: 0,
     formType: "Add",
   });
-
+  const obj = RoleRights.filter(
+    (item) =>
+      item.ActionUrl == "/UserMaster/UserRole" &&
+      item.OperationName == "User Role"
+  );
   const columnDefs = [
     {
       headerName: "Role Name",
@@ -86,6 +90,7 @@ const UserRole = () => {
     {
       cellRenderer: (params) => (
         <>
+         {obj[0].CanEdit && (
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
@@ -98,7 +103,7 @@ const UserRole = () => {
                 formType: "Update",
               });
             }}
-          />
+          />)}
         </>
       ),
       flex: 1,
@@ -295,17 +300,31 @@ const UserRole = () => {
         </div>
       ) : (
         <>
-          <nav className="navbar">
-            <div className="navbar-left">
-              <span className="navbar-logo">User Role</span>
+         <div className="page_header d-flex align-items-center justify-content-between">
+            <div className="d-flex">
+              <Link to="/UserMaster/UserRole">
+                <h2 className="page_title_sub active">User Role</h2>
+              </Link>
+              <Link to="/UserMaster/User">
+                <h2 className="page_title_sub">User</h2>
+              </Link>
+              <Link to="/UserMaster/UserRolePermission">
+                <h2 className="page_title_sub ">Role Permission</h2>
+              </Link>
             </div>
-            <div className="navbar-right">
-              <button className="nav-button" onClick={handleAddUserRole}>
-                Add Role
-              </button>
-              <button className="nav-button">Import Bulk</button>
+            <div className="pagehead_btn d-flex align-items-center">
+            {obj[0].CanAdd && (
+              <Link
+                className="primary_btn sprite add_btn me-1"
+              
+                data-bs-toggle="modal"
+                data-bs-target="#add_user"
+                onClick={handleAddUserRole}
+              >
+                Add User
+              </Link>)}
             </div>
-          </nav>
+          </div>
 
           <div className="grid-controls">
             <label>

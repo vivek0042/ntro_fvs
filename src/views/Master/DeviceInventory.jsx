@@ -18,15 +18,20 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 const DeviceInventory = () => {
   const { state, dispatch } = useGlobalState();
   const {
     devices,
     isFormOpen,
     LocationDropDown,
- 
+    RoleRights
   } = state;
-
+  const obj = RoleRights.filter(
+    (item) =>
+      item.ActionUrl == "/master/DeviceInventory" &&
+      item.OperationName == "Device Inventory"
+  );
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
   const [InvCount, setInvCount] = useState([]);
@@ -157,6 +162,7 @@ const DeviceInventory = () => {
     {
       cellRenderer: (params) => (
         <>
+         {obj[0].CanEdit && (
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
@@ -174,11 +180,12 @@ const DeviceInventory = () => {
                 formType: "Update",
               });
             }}
-          />
+          />)}
+             {obj[0].CanDelete && (
           <FaTrash
             style={{ marginRight: "10px", cursor: "pointer", color: "crimson" }}
             onClick={() => handleClickOpen(params.data.Id)}
-          />
+          />)}
         </>
       ),
       flex: 1,
@@ -488,15 +495,26 @@ const BindLocation = async () => {
         </div>
       ) : (
         <>
-         <nav className="navbar">
-      <div className="navbar-left">
-      <span className="navbar-logo">Device Inventory</span>
-      </div>
-      <div className="navbar-right">
-        <button className="nav-button" onClick={handleAddDevice}>Add Device</button>
-        <button className="nav-button">Import Bulk</button>
-      </div>
-    </nav>
+     
+    <div className="page_header d-flex align-items-center justify-content-between pt-2 pb-2">
+            <h2 className="page_title">Device Inventory</h2>
+            <div className="pagehead_btn d-flex align-items-center">
+            {obj[0].CanAdd && (
+              <Link
+                className="primary_btn sprite add_btn me-1"
+                id="btnAddDevice"
+                onClick={handleAddDevice}
+              >
+                Add Device
+              </Link>)}
+              <Link
+                className="trans_btn_bg sprite import_btn me-1"
+                to="/BulkUpload/ImportbulkDevice/"
+              >
+                Import Bulk Device
+              </Link>
+            </div>
+          </div>
            {InvCount.length != 0 && <InventoryCount count={InvCount} />}
           <div className="grid-controls">
             <label>

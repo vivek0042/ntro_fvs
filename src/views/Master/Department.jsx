@@ -22,9 +22,13 @@ const CardInventory = () => {
     activeCount,
     inactiveCount,
     isFormOpen,
-  
+    RoleRights
   } = state;
-
+  const obj = RoleRights.filter(
+    (item) =>
+      item.ActionUrl == "/master/Department" &&
+      item.OperationName == "Department"
+  );
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
   const [LocationDropDown, setLocationDropDown] = useState([]);
@@ -79,13 +83,13 @@ const CardInventory = () => {
 
     {
       cellRenderer: (params) => (
-        <>
+        <> {obj[0].CanEdit && (
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
               dispatch({ type: "TOGGLE_FORM" });
             }}
-          />
+          />)}
         </>
       ),
       flex: 1,

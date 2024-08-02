@@ -19,6 +19,7 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const User = () => {
   const { state, dispatch } = useGlobalState();
@@ -29,6 +30,7 @@ const User = () => {
     inactiveCount,
     isFormOpen,
     LocationDropDown,
+    RoleRights
   } = state;
   const [pageSize, setPageSize] = useState(10);
   const [gridApi, setGridApi] = useState(null);
@@ -42,22 +44,27 @@ const User = () => {
     RoleId: 0,
     RoleName: "",
     formType: "Add",
-  });
 
+  });
+ 
   const [open, setOpen] = useState(false);
-  const [edit,setEdit]=useState(false);
+  const [edit, setEdit] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
   const [deviceToDelete, setDeviceToDelete] = useState(0);
 
   const handleClickOpen = (userId) => {
     setOpen(true);
-    setDeviceToDelete(userId)
+    setDeviceToDelete(userId);
   };
 
   const handleClose = () => {
     setOpen(false);
   };
-
+  const obj = RoleRights.filter(
+    (item) =>
+      item.ActionUrl == "/UserMaster/User" &&
+      item.OperationName == "User"
+  );
   const handleConfirmDelete = async () => {
     try {
       const data = await del("UserMaster/DeleteUserManagement", {
@@ -131,6 +138,7 @@ const User = () => {
     {
       cellRenderer: (params) => (
         <>
+         {obj[0].CanEdit && (
           <FaEdit
             style={{ marginRight: "20px", cursor: "pointer", color: "skyblue" }}
             onClick={() => {
@@ -149,11 +157,12 @@ const User = () => {
               setIsDisabled(false);
               setEdit(true);
             }}
-          />
+          />)}
+             {obj[0].CanDelete && (
           <FaTrash
             style={{ marginRight: "10px", cursor: "pointer", color: "crimson" }}
             onClick={() => handleClickOpen(params.data.Id)}
-          />
+          />)}
         </>
       ),
       flex: 1,
@@ -173,7 +182,7 @@ const User = () => {
       dispatch({ type: "Fill_DROPDOWN", payload: data.RoleDetails });
     }
   };
- 
+
   const fetchData = async () => {
     try {
       const data = await get("UserMaster/GetUserManagement?id=0");
@@ -253,24 +262,22 @@ const User = () => {
       RoleName: "",
       formType: "Add",
     });
-    setIsDisabled(true)
+    setIsDisabled(true);
     setEdit(false);
   };
 
   const adidVerification = async (e) => {
-
     try {
-        var d = new Date();
-        var _txn = d.valueOf().toString();
-       
-       
-        var objreq = {
-            txn: _txn,
-            adid: e.target.value,
-            mode: "",
-            IsEnrollment: "2"
-        };
-      const data = await post("Transaction/getaddetails",objreq);
+      var d = new Date();
+      var _txn = d.valueOf().toString();
+
+      var objreq = {
+        txn: _txn,
+        adid: e.target.value,
+        mode: "",
+        IsEnrollment: "2",
+      };
+      const data = await post("Transaction/getaddetails", objreq);
 
       if (data != null) {
         if (data.ec == "0") {
@@ -288,7 +295,7 @@ const User = () => {
         } else if (data.ec == "310") {
           toast.success("ADId User found in Active directory.");
           setIsDisabled(false);
-          document.getElementById("UserId").setAttribute("disabled","true");
+          document.getElementById("UserId").setAttribute("disabled", "true");
           setFormData((prevState) => ({
             ...prevState,
             FirstName: data.firstName,
@@ -296,7 +303,7 @@ const User = () => {
             EmailAddress: data.email,
           }));
         } else {
-            setIsDisabled(true);
+          setIsDisabled(true);
         }
       }
     } catch (error) {}
@@ -320,10 +327,10 @@ const User = () => {
       FirstName: formData.FirstName,
       LastName: formData.LastName,
       EmailAddress: formData.EmailAddress,
-      Password: formData.Password||"",
+      Password: formData.Password || "",
       RoleId: formData.RoleId,
       RoleName: formData.RoleName,
-    EntityAdId: ""
+      EntityAdId: "",
     };
 
     try {
@@ -351,7 +358,6 @@ const User = () => {
     }
   };
 
- 
   return (
     <div className="content-inner">
       {isFormOpen ? (
@@ -412,10 +418,7 @@ const User = () => {
                 >
                   <option value="">Select a Role</option>
                   {LocationDropDown.map((location) => (
-                    <option
-                      key={location.RoleId}
-                      value={location.RoleId}
-                    >
+                    <option key={location.RoleId} value={location.RoleId}>
                       {location.RoleName}
                     </option>
                   ))}
@@ -438,17 +441,35 @@ const User = () => {
         </div>
       ) : (
         <>
-          <nav className="navbar">
-            <div className="navbar-left">
-              <span className="navbar-logo">User</span>
+          <div className="page_header d-flex align-items-center justify-content-between">
+            <div className="d-flex">
+              <Link to="/UserMaster/UserRole">
+                <h2 className="page_title_sub">User Role</h2>
+              </Link>
+              <Link to="/UserMaster/User">
+                <h2 className="page_title_sub active">User</h2>
+              </Link>
+              <Link to="/UserMaster/UserRolePermission">
+                <h2 className="page_title_sub ">Role Permission</h2>
+              </Link>
             </div>
-            <div className="navbar-right">
-              <button className="nav-button" onClick={handleAddUser}>
+            <div className="pagehead_btn d-flex align-items-center">
+            {obj[0].CanAdd && (
+              <Link
+                className="primary_btn sprite add_btn me-1"
+                href="#"
+                onClick={handleAddUser}
+              >
                 Add User
-              </button>
-              <button className="nav-button">Import Bulk</button>
+              </Link>)}
+              <Link
+                className="trans_btn_bg sprite import_btn me-1"
+                to="/BulkUpload/ImportbulkUser"
+              >
+                Import Bulk User
+              </Link>
             </div>
-          </nav>
+          </div>
 
           <CountHeader
             totalCount={totalCount}
