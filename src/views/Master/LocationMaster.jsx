@@ -23,6 +23,8 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
+import BulkUploadLocation from "../BulkUpload/BulkUploadLocation";
+import { useNavigate } from "react-router-dom";
 
 function LocationMaster() {
   const { state, dispatch } = useGlobalState();
@@ -92,6 +94,10 @@ function LocationMaster() {
   useEffect(() => {
     fetchData();
   }, []);
+  const navigate = useNavigate();
+  const handleImportLocation = () => {
+    navigate('/BulkUpload/BulkUploadLocation');
+  };
 
   const fetchData = async () => {
     try {
@@ -258,7 +264,7 @@ function LocationMaster() {
               <button className="nav-button" onClick={handleAddLocation}>
                 Add Location
               </button>
-              <button className="nav-button">Import Location</button>
+              <button className="nav-button" onClick={handleImportLocation}>Import Location</button>
             </div>
           </nav>
           <CountHeader

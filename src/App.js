@@ -14,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Department from '../src/views/Master/Department';
 import CompanyProfile from './views/Master/CompanyProfile';
 import AdminDashboard from './views/Master/AdminDashboard';
+import BulkUploadLocation from './views/BulkUpload/BulkUploadLocation';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/Master/AreaBuilding" element={<AreaBuilding/>}/>
           <Route path="/Master/CompanyProfile" element = {<CompanyProfile/>}/>
           <Route path="/Master/AdminDashboard" element = {<AdminDashboard/>}/>
+          <Route path="/BulkUpload/BulkUploadLocation" element = {<BulkUploadLocation/>}/>
           {/* Add more routes as needed */}
         </Routes>
       </MainLayout>
