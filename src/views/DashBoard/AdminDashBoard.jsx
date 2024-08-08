@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from 'react';
-
+import { useNavigate } from 'react-router-dom';
+import Button from '@mui/material/Button';
+import { useCookies } from 'react-cookie';
 const TwoColorLine = ({ value1, value2 }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-
+ 
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -50,6 +52,17 @@ const TwoColorLine = ({ value1, value2 }) => {
 const App = () => {
   const [value1, setValue1] = React.useState(40);
   const [value2, setValue2] = React.useState(60);
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+  const Navigate=useNavigate();
+  const handleLogout = () => {
+    // To remove all cookies
+    Object.keys(cookies).forEach(cookieName => {
+      removeCookie(cookieName, { path: '/' });
+    });
+
+    // Redirect to the login page or home page after logout
+    Navigate('/');
+  };
 
   return (
     <div>
@@ -67,6 +80,14 @@ const App = () => {
           <input type="number" value={value2} onChange={(e) => setValue2(Number(e.target.value))} />
         </label>
       </div>
+      <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleLogout}
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Logout
+          </Button>
     </div>
   );
 };

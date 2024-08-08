@@ -19,6 +19,7 @@ import UserRolePermission from "./views/User/UserRolePermission";
 import EntityMaster from "./views/Master/Entity";
 import AdminDashBoard from "./views/DashBoard/AdminDashBoard";
 import SignIn from "./views/Login";
+import Signin from "./views/signin";
 import EntityEnrollmentCardIssuance from "./views/Transaction/EntityEnrollmentCardIssuance";
 import { get } from "../src/services/api";
 import { useCookies } from "react-cookie";
@@ -64,7 +65,8 @@ function App() {
       <Router>
         <ToastContainer />
         <Routes>
-          <Route path="/" element={<SignIn />} />
+      
+          <Route path="/" element={<Signin/>}/>
           <Route
             path="*"
             element={
@@ -154,6 +156,7 @@ function App() {
                       element={<ProtectedEntityEnrollmentCardIssuance />}
                     />
                   )}
+                 
                 </Routes>
               </MainLayout>
             }
