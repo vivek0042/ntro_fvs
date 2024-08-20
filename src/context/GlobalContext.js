@@ -27,6 +27,7 @@ export const GlobalStateProvider = ({ children }) => {
 
   useEffect(() => {
     const roleRights = async () => {
+      if(cookies!=null){
       try {
         const data = await get(`UserMaster/GetUserRoleRights?id=${cookies.userroleid}`);
         if (data && data.UserRolePermissionMasterDetails) {
@@ -37,6 +38,7 @@ export const GlobalStateProvider = ({ children }) => {
       } catch (error) {
         console.error("Error fetching role rights:", error);
       }
+    }
     };
 
     if (cookies.userroleid) {

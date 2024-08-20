@@ -12,7 +12,7 @@ import { del, post, get } from "../../services/api";
 import { Link } from "react-router-dom";
 const UserRolePermission = () => {
   const { state, dispatch } = useGlobalState();
-  const { TableData, isFormOpen, LocationDropDown } = state;
+  const { TableData, isFormOpen, LocationDropDown , RoleRights } = state;
   const [expandedMenu, setExpandedMenu] = useState(null);
   // const [RoleId, setRoleId] = useState(0);
   const [formData, setFormData] = useState({

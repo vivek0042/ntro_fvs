@@ -27,6 +27,7 @@ function Signin() {
   const [loginPage, setLoginPage] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showSessionTimer, setShowSessionTimer] = useState(false);
+  const [dvPin, setDvPin] = useState(true);
   const [showPinError, setShowPinError] = useState(false);
   const [showPinSuccess, setShowPinSuccess] = useState(false);
   const [showCardSuccess, setShowCardSuccess] = useState(false);
@@ -40,7 +41,7 @@ function Signin() {
   const [navCard, setNavCard] = useState(false);
   const [navBio, setNavBio] = useState(false);
   const [pinValues, setPinValues] = useState(new Array(6).fill(""));
- 
+  const [dataForUser, setDataForUser] = useState({});
   const handlePin = (value, index) => {
     if (value.length > 1) return;
     const newPinValues = [...pinValues];
@@ -54,6 +55,7 @@ function Signin() {
   };
 
   const toggleNavBio = () => setNavBio(!navBio);
+  const toggleDvPin = () => setDvPin(dvPin);
   const toggleNavCard = () => setNavCard(!navCard);
   const toggleNavPin = () => setNavPin(!navPin);
   const toggleLoginPage = () => setLoginPage(!loginPage);
@@ -114,6 +116,7 @@ function Signin() {
     }
 
     const response = await post("Account/UserLogin", req);
+    setDataForUser(response);
     setFormData({
       UserName: "",
       Password: "",
@@ -177,7 +180,7 @@ function Signin() {
     }));
   };
 
-  const handlePinVerify=async()=>{
+  const handlePinVerify = async () => {
     const pin = pinValues.join("");
     var d = new Date();
     var txn = d.valueOf().toString();
@@ -186,58 +189,86 @@ function Signin() {
     if (cookies.authType == "1") {
       _idx = "-1";
     }
+
     var data = {
       pin: pin,
       txn: txn,
-      adid: cookies.UserId,
+      adid: dataForUser.userName,
       roleId: "1",
-      cin: cookies.cardSerialNo,
+      cin: dataForUser.cardSerialNo,
       idx: _idx,
-      mcsn: cookies.Mcsn,
+      mcsn: dataForUser.mcsn,
     };
 
-    const response = CheckPin(data);
+    const response = await post("account/checkpin", data);
+
     var BionicV7Request = {
       reqdata: response,
     };
-    var isBodyAvailable = 1;
+     var isBodyAvailable = 1;
     var method = "verification";
-    const res = postBionicV7Client(
+    const res =await postBionicV7Client(
       method,
       JSON.stringify(BionicV7Request),
       isBodyAvailable
     );
-    if (res.data.ErrorCode == "0" &&  cookies.authType == "2") {
-        var delay = 3000;
-        var d = new Date();
-        var txn = d.valueOf().toString();
-        setTimeout(showPinSuccess, 500); // Show PIN success box after 1000 milliseconds (1 second)
-        setTimeout(showCardSuccess, 1500);
-        setTimeout(function () {
-            window.location.href = "/Home/AdminDashboard";
-        }, delay); // Show Card success box after 2000 milliseconds (2 seconds)
-    }
-   else if (res.data.ErrorCode == "0" &&  cookies.authType == "1") {
-        var delay = 3000;
-        var d = new Date();
-        var txn = d.valueOf().toString();
-        setTimeout(showPinSuccess, 500); // Show PIN success box after 1000 milliseconds (1 second)
-        setTimeout(showCardSuccess, 1500);
-        setTimeout(function () {
-            window.location.href = "/Home/AdminDashboard";
-        }, delay); // Show Card success box after 2000 milliseconds (2 seconds)
-    }
-  }
+    //  var biteArray = StringToByteArrayFastest(res.resdata);
+    // const decRes = await post("account/DecData", biteArray);
+    if (res.data.ErrorCode == "0" && dataForUser.authType == 2) {
+      var delay = 3000;
+      var d = new Date();
+      var txn = d.valueOf().toString();
+      toggleDvPin();
 
-  function showPinSuccesss(){
+      setTimeout(togglePinSuccess(), 500);
+     // Show PIN success box after 1000 milliseconds (1 second)
+      setTimeout(toggleCardSuccess(), 2500);
+      setTimeout(function () {
+        window.location.href = "/Dashboard/Admindashboard";
+      }, delay); // Show Card success box after 2000 milliseconds (2 seconds)
+    } else if (res.data.ErrorCode == "0" && dataForUser.authType == 1) {
+      var delay = 3000;
+      var d = new Date();
+      var txn = d.valueOf().toString();
+      toggleDvPin();
+      setTimeout(togglePinSuccess(), 500); 
+      // Show PIN success box after 1000 milliseconds (1 second)
+      setTimeout(toggleCardSuccess(), 2500);
+      setTimeout(function () {
+        window.location.href = "/Dashboard/Admindashboard";
+      }, delay); // Show Card success box after 2000 milliseconds (2 seconds)
+    }
+  };
+  // function StringToByteArrayFastest(hex) {
+  //   if (hex.Length % 2 == 1)
+  //     throw new Exception("The binary key cannot have an odd number of digits");
+
+  //   var arr = new byte[hex.Length >> 1]();
+
+  //   for (let i = 0; i < hex.Length >> 1; ++i) {
+  //     arr[i] = byte(
+  //       (GetHexVal(hex[i << 1]) << 4) + GetHexVal(hex[(i << 1) + 1])
+  //     );
+  //   }
+  //   function GetHexVal(hex) {
+  //     var val = parseInt(hex);
+  //     //For uppercase A-F letters:
+  //     //return val - (val < 58 ? 48 : 55);
+  //     //For lowercase a-f letters:
+  //     //return val - (val < 58 ? 48 : 87);
+  //     //Or the two combined, but a bit slower:
+  //     return val - (val < 58 ? 48 : val < 97 ? 55 : 87);
+  //   }
+  //   return arr;
+  // }
+  function showPinSuccesss() {
     togglePinSuccess();
     toggleNavBio();
   }
 
-  function showCardSuccesss(){
+  function showCardSuccesss() {
     togglePinSuccess();
     toggleCardSuccess();
-
   }
 
   return (
@@ -505,6 +536,7 @@ function Signin() {
                               role="tabpanel"
                               aria-labelledby="nav-pin-tab"
                             >
+                              {dvPin && (
                               <div id="dvPin">
                                 <div className="tabbody d-flex justify-content-between">
                                   <div className="tabbody_header">
@@ -533,7 +565,7 @@ function Signin() {
                                         </div>
                                       ))}
                                     </div>
-                                  </div>
+                                    </div>
                                   {showPinSuccess && (
                                     <p
                                       className="pinerror_login color_red"
@@ -557,7 +589,7 @@ function Signin() {
                                     </button>
                                   </div>
                                 </div>
-                              </div>
+                              </div>)}
                               {showPinSuccess && (
                                 <div
                                   className="tabbody msgBox"

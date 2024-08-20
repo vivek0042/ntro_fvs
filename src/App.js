@@ -50,6 +50,7 @@ function App() {
     roleRights();
   }, [cookies.userroleid]);
   const roleRights = async () => {
+    if(Object.keys(cookies).length!=0){
     const data = await get(
       "UserMaster/GetUserRoleRights?id=" + cookies.userroleid
     );
@@ -58,7 +59,7 @@ function App() {
       (item) => item.CanView
     ).map((item) => item.ActionUrl);
 
-    setActionUrls(actionUrls);
+    setActionUrls(actionUrls);}
   };
   return (
     <GlobalStateProvider>

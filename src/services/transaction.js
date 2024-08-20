@@ -9,8 +9,7 @@ const ECInstance = new EC('curve25519');
 
 const DevicePriKeyPem = `MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgDB3NUBaPaDF9fn2mzIgYB5v3XOIhyi6mwoDmJBb7AhahRANCAASHho/RP1nLXcMT/3x3iMqh/0Ojf6Y34sanshpRUKovqlqGRg91wgMpTct7uu07Vxpj6RIZoBrHqiiF3FPkl6Tr`;
 
-const HostPubKeyPem = `-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExVFK/egmSDFuvRIkJdfoguYGvzMd
-/djcYFtBe43J5TkT17PGiWNpwWL0wZ9aGzClZ4pStpHZ0e8iemFxOB6pgg==`;
+const HostPubKeyPem = `MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExVFK/egmSDFuvRIkJdfoguYGvzMd/djcYFtBe43J5TkT17PGiWNpwWL0wZ9aGzClZ4pStpHZ0e8iemFxOB6pgg==`;
 
 
 // Convert PEM to DER
@@ -68,25 +67,28 @@ const getSharedSecretValue = (privKeyBase64, pubKeyBase64) => {
     const publicKey = getPublicKeyFrom(pubKeyBase64);
   
     // Generate shared secret
-    const sharedSecret = privateKey.deriveSharedSecret(publicKey);
-    return sharedSecret;
+    const sharedSecret = privateKey.derive(publicKey.getPublic());
+  return Buffer.from(sharedSecret.toString('hex'), 'hex');
+  
   };
     // Function to get private key from Base64 string
     const getPrivateKeyFrom = (privateKeyBase64) => {
         const privateKeyBytes = getByteFromBase64(privateKeyBase64);
-        const privateKeyDer = forge.util.createBuffer(privateKeyBytes);
-        const privateKeyAsn1 = forge.asn1.fromDer(privateKeyDer);
-        const privateKey = forge.pki.privateKeyFromAsn1(privateKeyAsn1);
-        return privateKey;
+        // const privateKeyDer = forge.util.createBuffer(privateKeyBytes);
+        // const privateKeyAsn1 = forge.asn1.fromDer(privateKeyDer);
+        // const privateKey = forge.pki.privateKeyFromAsn1(privateKeyAsn1);
+        return ECInstance.keyFromPrivate(privateKeyBytes);
+       
       };
       
       // Function to get public key from Base64 string
       const getPublicKeyFrom = (publicKeyBase64) => {
         const publicKeyBytes = getByteFromBase64(publicKeyBase64);
-        const publicKeyDer = forge.util.createBuffer(publicKeyBytes);
-        const publicKeyAsn1 = forge.asn1.fromDer(publicKeyDer);
-        const publicKey = forge.pki.publicKeyFromAsn1(publicKeyAsn1);
-        return publicKey;
+        // const publicKeyDer = forge.util.createBuffer(publicKeyBytes);
+        // const publicKeyAsn1 = forge.asn1.fromDer(publicKeyDer);
+        // const publicKey = forge.pki.publicKeyFromAsn1(publicKeyAsn1);
+        return ECInstance.keyFromPublic(publicKeyBytes);
+        
       };
     
     
